@@ -52,7 +52,7 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ## 📸 Interface Preview
 
-<img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/0267a037-f968-48ff-ad0d-1ada955c1781" />
+<img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/ed735113-bab8-4c0d-9740-6a77aa1d29b9" />
 
 ---
 
