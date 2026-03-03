@@ -1,6 +1,7 @@
 ﻿// ======================================================================================================
 // Zafuse - Multi INI File Content Analysis Software
 // © Copyright 2025-2026, Eray Türkay.
+// Publisher: Türkay Software
 // Project Type: Open Source
 // License: MIT License
 // Website: https://www.turkaysoftware.com/zafuse
@@ -144,10 +145,10 @@ namespace Zafuse{
             //
             // THEME - LANG - STARTUP - HIDIN MODE PRELOADER
             // ======================================================================================================
-            TSSettingsSave software_read_settings = new TSSettingsSave(ts_sf);
+            TSSettingsModule software_read_settings = new TSSettingsModule(ts_sf);
             //
             int theme_mode = int.TryParse(software_read_settings.TSReadSettings(ts_settings_container, "ThemeStatus"), out int the_status) && (the_status == 0 || the_status == 1 || the_status == 2) ? the_status : 1;
-            if (theme_mode == 2) { themeSystem = 2; Theme_engine(GetSystemTheme(2)); } else Theme_engine(theme_mode);
+            if (theme_mode == 2) { themeSystem = 2; Theme_engine(TSThemeModeHelper.GetSystemTheme(2)); } else Theme_engine(theme_mode);
             darkThemeToolStripMenuItem.Checked = theme_mode == 0;
             lightThemeToolStripMenuItem.Checked = theme_mode == 1;
             systemThemeToolStripMenuItem.Checked = theme_mode == 2;
@@ -434,7 +435,7 @@ namespace Zafuse{
         // ======================================================================================================
         private void SaveManuelPath(string name, string path){
             try{
-                TSSettingsSave save = new TSSettingsSave(ts_sf);
+                TSSettingsModule save = new TSSettingsModule(ts_sf);
                 string existing = save.TSReadSettings(ts_settings_container, "ManuelPaths");
                 string newValue = existing + (string.IsNullOrEmpty(existing) ? "" : ";") + $"{name}|{path}";
                 save.TSWriteSettings(ts_settings_container, "ManuelPaths", newValue);
@@ -443,7 +444,7 @@ namespace Zafuse{
         private void LoadManuelPaths(){
             ManuelLangPaths.Clear();
             try{
-                TSSettingsSave read = new TSSettingsSave(ts_sf);
+                TSSettingsModule read = new TSSettingsModule(ts_sf);
                 string rawPaths = read.TSReadSettings(ts_settings_container, "ManuelPaths");
                 if (string.IsNullOrEmpty(rawPaths)) return;
                 foreach (var entry in rawPaths.Split(';')){
@@ -456,7 +457,7 @@ namespace Zafuse{
         }
         private void RemovePathFromSettings(string nameToRemove){
             try{
-                TSSettingsSave settings = new TSSettingsSave(ts_sf);
+                TSSettingsModule settings = new TSSettingsModule(ts_sf);
                 string rawPaths = settings.TSReadSettings(ts_settings_container, "ManuelPaths");
                 if (string.IsNullOrEmpty(rawPaths)) return;
                 var entries = rawPaths.Split(';').Select(e => e.Split('|')).Where(p => p.Length == 2 && p[0] != nameToRemove).Select(p => $"{p[0]}|{p[1]}").ToList();
@@ -723,7 +724,7 @@ namespace Zafuse{
         // THEME SWAP
         // ======================================================================================================
         private void SystemThemeToolStripMenuItem_Click(object sender, EventArgs e){
-            themeSystem = 2; Theme_engine(GetSystemTheme(2)); SaveTheme(2); Select_theme_active(sender);
+            themeSystem = 2; Theme_engine(TSThemeModeHelper.GetSystemTheme(2)); SaveTheme(2); Select_theme_active(sender);
         }
         private void LightThemeToolStripMenuItem_Click(object sender, EventArgs e){
             themeSystem = 0; Theme_engine(1); SaveTheme(1); Select_theme_active(sender);
@@ -731,11 +732,11 @@ namespace Zafuse{
         private void DarkThemeToolStripMenuItem_Click(object sender, EventArgs e){
             themeSystem = 0; Theme_engine(0); SaveTheme(0); Select_theme_active(sender);
         }
-        private void TSUseSystemTheme(){ if (themeSystem == 2) Theme_engine(GetSystemTheme(2)); }
+        private void TSUseSystemTheme(){ if (themeSystem == 2) Theme_engine(TSThemeModeHelper.GetSystemTheme(2)); }
         private void SaveTheme(int ts){
             // SAVE CURRENT THEME
             try{
-                TSSettingsSave software_setting_save = new TSSettingsSave(ts_sf);
+                TSSettingsModule software_setting_save = new TSSettingsModule(ts_sf);
                 software_setting_save.TSWriteSettings(ts_settings_container, "ThemeStatus", Convert.ToString(ts));
             }catch (Exception){ }
         }
@@ -920,7 +921,7 @@ namespace Zafuse{
         private void Lang_preload(string lang_type, string lang_code){
             Lang_engine(lang_type, lang_code);
             try{
-                TSSettingsSave software_setting_save = new TSSettingsSave(ts_sf);
+                TSSettingsModule software_setting_save = new TSSettingsModule(ts_sf);
                 software_setting_save.TSWriteSettings(ts_settings_container, "LanguageStatus", lang_code);
             }catch (Exception){ }
             // LANG CHANGE NOTIFICATION
@@ -1023,7 +1024,7 @@ namespace Zafuse{
         }
         private void Startup_mode_settings(string get_startup_value){
             try{
-                TSSettingsSave software_setting_save = new TSSettingsSave(ts_sf);
+                TSSettingsModule software_setting_save = new TSSettingsModule(ts_sf);
                 software_setting_save.TSWriteSettings(ts_settings_container, "StartupStatus", get_startup_value);
             }catch (Exception){ }
         }
@@ -1045,7 +1046,7 @@ namespace Zafuse{
             //
             string analysis_result = string.Join(",", selectedItems);
             try{
-                TSSettingsSave software_setting_save = new TSSettingsSave(ts_sf);
+                TSSettingsModule software_setting_save = new TSSettingsModule(ts_sf);
                 software_setting_save.TSWriteSettings(ts_settings_container, "AnalysisStatus", analysis_result);
             }catch (Exception){ }
         }
