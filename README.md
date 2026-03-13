@@ -1,4 +1,4 @@
-# ⚡ Zafuse | Advanced Multi-INI Content Analysis Software
+# ⚡ Zafuse - Advanced Multi-INI Content Analysis Software
 
 ![GitHub all releases](https://img.shields.io/github/downloads/turkaysoftware/zafuse/total?style=for-the-badge&color=DF313F)
 ![GitHub Repo stars](https://img.shields.io/github/stars/turkaysoftware/zafuse?style=for-the-badge&color=167C33)
