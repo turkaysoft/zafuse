@@ -4,7 +4,6 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/turkaysoftware/zafuse?style=for-the-badge&color=167C33)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/turkaysoftware/zafuse?style=for-the-badge&color=9A194C)
 ![Platform](https://img.shields.io/badge/platform-Windows-366194?style=for-the-badge&logo=windows)
-![GitHub license](https://img.shields.io/github/license/turkaysoftware/zafuse?style=for-the-badge&color=17796E)
 
 **Zafuse** is a high-performance **INI analysis tool** developed by **Eray Türkay**. Engineered for speed and precision, it is specifically designed to detect inconsistencies in multi-language configuration files. Whether you are managing complex localization datasets or auditing large-scale software configs, Zafuse pinpointing missing or desynchronized data with absolute precision.
 
