@@ -1,4 +1,4 @@
-# ⚡ Zafuse - Advanced Multi-INI Content Analysis Software
+# Zafuse - Advanced Multi-INI Content Analysis Software
 
 ![GitHub all releases](https://img.shields.io/github/downloads/turkaysoftware/zafuse/total?style=for-the-badge&color=DF313F)
 ![GitHub Repo stars](https://img.shields.io/github/stars/turkaysoftware/zafuse?style=for-the-badge&color=167C33)
@@ -10,8 +10,8 @@
 
 ---
 
-### ☕ Support the Project
-Zafuse is free and will always be. If you find it useful, consider supporting the development!
+### Donate
+You can support this project by making a donation to help ensure its sustainability and the development of new features.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-DF313F?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/turkaysoftware)
 
@@ -19,18 +19,18 @@ Zafuse is free and will always be. If you find it useful, consider supporting th
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-* 🛡️ **Privacy First:** No data ever leaves your computer. All analysis is performed locally on your device.
-* 🚀 **Pure Performance:** Developed in **pure .NET** with **zero external library dependencies**, ensuring unrivaled scanning speed.
-* 🌓 **Modern UI:** Sophisticated interface with Light, Dark, and System theme support for high readability.
-* 🌍 **Multilingual:** Fully supports 15+ languages including Arabic, Chinese, English, German, and Turkish.
-* 📦 **Portable & Lightweight:** Takes up only ~1.5 MB of space and runs with an incredibly low memory footprint (17-20 MB RAM).
-* 🆓 **Truly Free:** High-end developer features provided at no cost, with no hidden paywalls.
+* **Privacy First:** No data ever leaves your computer. All analysis is performed locally on your device.
+* **Pure Performance:** Developed in **pure .NET** with **zero external library dependencies**, ensuring unrivaled scanning speed.
+* **Modern UI:** Sophisticated interface with Light, Dark, and System theme support for high readability.
+* **Multilingual:** Fully supports 15+ languages including Arabic, Chinese, English, German, and Turkish.
+* **Portable & Lightweight:** Takes up only ~1.5 MB of space and runs with an incredibly low memory footprint (17-20 MB RAM).
+* **Truly Free:** High-end developer features provided at no cost, with no hidden paywalls.
 
 ---
 
-## 🛠️ Advanced Capabilities
+## Advanced Capabilities
 
 Zafuse offers a specialized toolkit to resolve complex file structures in seconds:
 
@@ -43,20 +43,20 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ---
 
-## 🛠️ Automatic Updates and Translation Support
+## Automatic Updates and Translation Support
 
 * **TS Wizard Integration:** Fully compatible with [TS Wizard](https://www.turkaysoftware.com/ts-wizard) for automatic updates and system monitoring.
 * **Translation Support:** Community-driven localization via the official [Translation Guide](https://github.com/turkaysoftware/zafuse/discussions/1).
 
 ---
 
-## 📸 Interface Preview
+## Interface Preview
 
 <img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/ed735113-bab8-4c0d-9740-6a77aa1d29b9" />
 
 ---
 
-## 💻 System Requirements
+## System Requirements
 
 | Feature | Minimum Requirements | Recommended Requirements |
 | :--- | :--- | :--- |
@@ -66,7 +66,7 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1.  Navigate to the **[Releases](https://github.com/turkaysoftware/zafuse/releases/latest)** page.
 2.  Download the latest ZIP file.
@@ -77,7 +77,7 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ---
 
-## 🛡️ Security
+## Security
 
 * **Zero Data Export Policy:** Your privacy is our priority; no data leaves your machine.
 * **No Dependencies:** Developed entirely from scratch using its own source code, there are no risks from security vulnerabilities in third-party libraries.
@@ -85,6 +85,6 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ---
 
-## 📄 License
+## License
 
 This software is offered free of charge as part of the **Türkay Software solutions package** and is protected under the [**MIT License**](https://github.com/turkaysoftware/zafuse?tab=MIT-1-ov-file).
