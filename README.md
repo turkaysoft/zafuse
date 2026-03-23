@@ -1,9 +1,9 @@
 # Zafuse - Advanced Multi-INI Content Analysis Software
 
-[![GitHub downloads](https://img.shields.io/github/downloads/turkaysoftware/zafuse/total?style=flat&color=1a893c)](https://github.com/turkaysoftware/zafuse/releases)
-[![GitHub stars](https://img.shields.io/github/stars/turkaysoftware/zafuse?style=flat&color=0062cc)](https://github.com/turkaysoftware/zafuse/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/turkaysoftware/zafuse?style=flat&color=5a32a3)](https://github.com/turkaysoftware/zafuse/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-Windows-b31d28?style=flat)](https://github.com/turkaysoftware/zafuse)
+[![GitHub downloads](https://img.shields.io/github/downloads/turkaysoftware/zafuse/total?style=flat&color=1a893c&label=Downloads)](https://github.com/turkaysoftware/zafuse/releases)
+[![GitHub stars](https://img.shields.io/github/stars/turkaysoftware/zafuse?style=flat&color=0062cc&label=Stars)](https://github.com/turkaysoftware/zafuse/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/turkaysoftware/zafuse?style=flat&color=5a32a3&label=Latest%20Release)](https://github.com/turkaysoftware/zafuse/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows-b31d28?style=flat&label=Platform)](https://github.com/turkaysoftware/zafuse)
 
 **Zafuse** is a high-performance **INI analysis tool** developed by **Eray Türkay**. Engineered for speed and precision, it is specifically designed to detect inconsistencies in multi-language configuration files. Whether you are managing complex localization datasets or auditing large-scale software configs, Zafuse pinpointing missing or desynchronized data with absolute precision.
 
