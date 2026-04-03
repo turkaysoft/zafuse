@@ -57,8 +57,8 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 | Feature | Minimum Requirements | Recommended Requirements |
 | :--- | :--- | :--- |
-| **OS** | Windows 10 20H2 x64 | Windows 11 25H2 x64 |
-| **RAM** | 25 MB Free RAM | 100 MB Free RAM |
+| **OS** | Windows 10 20H2 x64 | Windows 10 22H2 x64 |
+| **RAM** | 50 MB Free RAM | 75 MB Free RAM |
 | **.NET** | .NET Framework 4.8.1 | .NET Framework 4.8.1 |
 
 ---
