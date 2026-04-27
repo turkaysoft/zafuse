@@ -24,6 +24,11 @@ You can support this project by making a donation to help ensure its sustainabil
 * **Multilingual:** Fully supports 15+ languages including Arabic, Chinese, English, German, and Turkish.
 * **Portable & Lightweight:** Takes up only ~1.5 MB of space and runs with an incredibly low memory footprint (17-20 MB RAM).
 * **Truly Free:** High-end developer features provided at no cost, with no hidden paywalls.
+---
+
+## Interface Preview
+
+<img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/c79172f7-9583-4361-b0dd-13655a7c1864" />
 
 ---
 
@@ -43,12 +48,6 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 ## Translation Support
 
 * **Translation Support:** Community-driven localization via the official [Translation Guide](https://github.com/turkaysoftware/zafuse/discussions/1).
-
----
-
-## Interface Preview
-
-<img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/c79172f7-9583-4361-b0dd-13655a7c1864" />
 
 ---
 
