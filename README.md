@@ -1,9 +1,9 @@
 # Zafuse - Advanced Multi-INI Content Analysis Software
 
-[![GitHub downloads](https://img.shields.io/github/downloads/turkaysoftware/zafuse/total?style=flat&color=1a893c&label=Downloads)](https://github.com/turkaysoftware/zafuse/releases)
-[![GitHub stars](https://img.shields.io/github/stars/turkaysoftware/zafuse?style=flat&color=0062cc&label=Stars)](https://github.com/turkaysoftware/zafuse/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/turkaysoftware/zafuse?style=flat&color=5a32a3&label=Latest%20Release)](https://github.com/turkaysoftware/zafuse/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-Windows-b31d28?style=flat&label=Platform)](https://github.com/turkaysoftware/zafuse)
+[![GitHub downloads](https://img.shields.io/github/downloads/turkaysoft/zafuse/total?style=flat&color=1a893c&label=Downloads)](https://github.com/turkaysoft/zafuse/releases)
+[![GitHub stars](https://img.shields.io/github/stars/turkaysoft/zafuse?style=flat&color=0062cc&label=Stars)](https://github.com/turkaysoft/zafuse/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/turkaysoft/zafuse?style=flat&color=5a32a3&label=Latest%20Release)](https://github.com/turkaysoft/zafuse/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows-b31d28?style=flat&label=Platform)](https://github.com/turkaysoft/zafuse)
 
 **Zafuse** is a high-performance **INI analysis tool** developed by **Eray Türkay**. Engineered for speed and precision, it is specifically designed to detect inconsistencies in multi-language configuration files. Whether you are managing complex localization datasets or auditing large-scale software configs, Zafuse pinpointing missing or desynchronized data with absolute precision.
 
@@ -12,7 +12,7 @@
 ### Donate
 You can support this project by making a donation to help ensure its sustainability and the development of new features.
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-0a6628?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/turkaysoftware)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-0a6628?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/turkaysoft)
 
 ---
 
@@ -47,7 +47,7 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ## Translation Support
 
-* **Translation Support:** Community-driven localization via the official [Translation Guide](https://github.com/turkaysoftware/zafuse/discussions/1).
+* **Translation Support:** Community-driven localization via the official [Translation Guide](https://github.com/turkaysoft/zafuse/discussions/1).
 
 ---
 
@@ -64,7 +64,7 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ## Getting Started
 
-1.  Navigate to the **[Releases](https://github.com/turkaysoftware/zafuse/releases/latest)** page.
+1.  Navigate to the **[Releases](https://github.com/turkaysoft/zafuse/releases/latest)** page.
 2.  Download the latest ZIP file.
 3.  **Extract all files from the ZIP** (Important: Application requires all folder contents to run correctly).
 4.  Launch the executable corresponding to your architecture:
@@ -83,4 +83,4 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ## License
 
-This software is offered free of charge as part of the **Türkay Software solutions package** and is protected under the [**MIT License**](https://github.com/turkaysoftware/zafuse?tab=MIT-1-ov-file).
+This software is offered free of charge as part of the **Türkay Software solutions package** and is protected under the [**MIT License**](https://github.com/turkaysoft/zafuse?tab=MIT-1-ov-file).
