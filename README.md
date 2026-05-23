@@ -24,6 +24,8 @@ You can support this project by making a donation to help ensure its sustainabil
 * **Multilingual:** Fully supports 15+ languages including Arabic, Chinese, English, German, and Turkish.
 * **Portable & Lightweight:** Takes up only ~1.5 MB of space and runs with an incredibly low memory footprint (17-20 MB RAM).
 * **Truly Free:** High-end developer features provided at no cost, with no hidden paywalls.
+* **Built-in Update Mechanism:** It features a built-in smart update mechanism developed specifically by **Türkaysoft**.
+
 ---
 
 ## Interface Preview
