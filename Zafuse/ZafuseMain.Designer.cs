@@ -66,18 +66,17 @@
             this.caPlaceholders = new System.Windows.Forms.ToolStripMenuItem();
             this.caPunctuationMarks = new System.Windows.Forms.ToolStripMenuItem();
             this.caNailSigns = new System.Windows.Forms.ToolStripMenuItem();
+            this.caNumbers = new System.Windows.Forms.ToolStripMenuItem();
             this.caCommentLines = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tSWizardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.donateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.BackPanel = new System.Windows.Forms.Panel();
-            this.SelDGV = new System.Windows.Forms.DataGridView();
-            this.MainDGV = new System.Windows.Forms.DataGridView();
-            this.caNumbers = new System.Windows.Forms.ToolStripMenuItem();
             this.BtnGenReport = new Zafuse.TSCustomButton();
+            this.SelDGV = new System.Windows.Forms.DataGridView();
             this.BtnRemoveFolder = new Zafuse.TSCustomButton();
+            this.MainDGV = new System.Windows.Forms.DataGridView();
             this.BtnAddFolder = new Zafuse.TSCustomButton();
             this.HeaderMenu.SuspendLayout();
             this.BackPanel.SuspendLayout();
@@ -89,7 +88,6 @@
             // 
             this.HeaderMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.settingsToolStripMenuItem,
-            this.tSWizardToolStripMenuItem,
             this.donateToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.HeaderMenu.Location = new System.Drawing.Point(0, 0);
@@ -118,7 +116,7 @@
             this.darkThemeToolStripMenuItem,
             this.systemThemeToolStripMenuItem});
             this.themeToolStripMenuItem.Name = "themeToolStripMenuItem";
-            this.themeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.themeToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.themeToolStripMenuItem.Text = "Theme";
             // 
             // lightThemeToolStripMenuItem
@@ -164,7 +162,7 @@
             this.spanishToolStripMenuItem,
             this.turkishToolStripMenuItem});
             this.languageToolStripMenuItem.Name = "languageToolStripMenuItem";
-            this.languageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.languageToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.languageToolStripMenuItem.Text = "Language";
             // 
             // arabicToolStripMenuItem
@@ -263,7 +261,7 @@
             this.windowedToolStripMenuItem,
             this.fullScreenToolStripMenuItem});
             this.startupToolStripMenuItem.Name = "startupToolStripMenuItem";
-            this.startupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.startupToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.startupToolStripMenuItem.Text = "Startup";
             // 
             // windowedToolStripMenuItem
@@ -291,7 +289,7 @@
             this.caNumbers,
             this.caCommentLines});
             this.contentAnalysis.Name = "contentAnalysis";
-            this.contentAnalysis.Size = new System.Drawing.Size(180, 22);
+            this.contentAnalysis.Size = new System.Drawing.Size(173, 22);
             this.contentAnalysis.Text = "İçerik Analizi";
             // 
             // caPlaceholders
@@ -315,6 +313,13 @@
             this.caNailSigns.Size = new System.Drawing.Size(198, 22);
             this.caNailSigns.Text = "Tırnak İşaretleri";
             // 
+            // caNumbers
+            // 
+            this.caNumbers.Name = "caNumbers";
+            this.caNumbers.ShortcutKeys = System.Windows.Forms.Keys.F9;
+            this.caNumbers.Size = new System.Drawing.Size(198, 22);
+            this.caNumbers.Text = "Sayılar";
+            // 
             // caCommentLines
             // 
             this.caCommentLines.Name = "caCommentLines";
@@ -326,19 +331,9 @@
             // 
             this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
             this.checkForUpdatesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
-            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.checkForUpdatesToolStripMenuItem.Text = "Check Update";
             this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.CheckForUpdatesToolStripMenuItem_Click);
-            // 
-            // tSWizardToolStripMenuItem
-            // 
-            this.tSWizardToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.tSWizardToolStripMenuItem.Name = "tSWizardToolStripMenuItem";
-            this.tSWizardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.S)));
-            this.tSWizardToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
-            this.tSWizardToolStripMenuItem.Text = "TS Wizard";
-            this.tSWizardToolStripMenuItem.Click += new System.EventHandler(this.TSWizardToolStripMenuItem_Click);
             // 
             // donateToolStripMenuItem
             // 
@@ -377,6 +372,34 @@
             this.BackPanel.Padding = new System.Windows.Forms.Padding(5, 5, 8, 5);
             this.BackPanel.Size = new System.Drawing.Size(1008, 577);
             this.BackPanel.TabIndex = 1;
+            // 
+            // BtnGenReport
+            // 
+            this.BtnGenReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnGenReport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnGenReport.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnGenReport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.BtnGenReport.BorderColor = System.Drawing.Color.SlateBlue;
+            this.BtnGenReport.BorderRadius = 10;
+            this.BtnGenReport.BorderSize = 0;
+            this.BtnGenReport.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnGenReport.FlatAppearance.BorderSize = 0;
+            this.BtnGenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BtnGenReport.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
+            this.BtnGenReport.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnGenReport.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnGenReport.Location = new System.Drawing.Point(746, 113);
+            this.BtnGenReport.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
+            this.BtnGenReport.Name = "BtnGenReport";
+            this.BtnGenReport.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.BtnGenReport.Size = new System.Drawing.Size(250, 36);
+            this.BtnGenReport.TabIndex = 3;
+            this.BtnGenReport.Text = "Rapor Oluştur";
+            this.BtnGenReport.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnGenReport.TextColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnGenReport.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.BtnGenReport.UseVisualStyleBackColor = false;
+            this.BtnGenReport.Click += new System.EventHandler(this.BtnGenReport_Click);
             // 
             // SelDGV
             // 
@@ -433,6 +456,34 @@
             this.SelDGV.TabIndex = 0;
             this.SelDGV.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SelDGV_CellClick);
             // 
+            // BtnRemoveFolder
+            // 
+            this.BtnRemoveFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnRemoveFolder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnRemoveFolder.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnRemoveFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.BtnRemoveFolder.BorderColor = System.Drawing.Color.SlateBlue;
+            this.BtnRemoveFolder.BorderRadius = 10;
+            this.BtnRemoveFolder.BorderSize = 0;
+            this.BtnRemoveFolder.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnRemoveFolder.FlatAppearance.BorderSize = 0;
+            this.BtnRemoveFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BtnRemoveFolder.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
+            this.BtnRemoveFolder.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnRemoveFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnRemoveFolder.Location = new System.Drawing.Point(746, 64);
+            this.BtnRemoveFolder.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
+            this.BtnRemoveFolder.Name = "BtnRemoveFolder";
+            this.BtnRemoveFolder.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.BtnRemoveFolder.Size = new System.Drawing.Size(250, 36);
+            this.BtnRemoveFolder.TabIndex = 2;
+            this.BtnRemoveFolder.Text = "Klasörü Kaldır";
+            this.BtnRemoveFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnRemoveFolder.TextColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnRemoveFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.BtnRemoveFolder.UseVisualStyleBackColor = false;
+            this.BtnRemoveFolder.Click += new System.EventHandler(this.BtnRemoveFolder_Click);
+            // 
             // MainDGV
             // 
             this.MainDGV.AllowUserToAddRows = false;
@@ -488,69 +539,6 @@
             this.MainDGV.Size = new System.Drawing.Size(984, 360);
             this.MainDGV.TabIndex = 4;
             this.MainDGV.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.MainDGV_CellFormatting);
-            // 
-            // caNumbers
-            // 
-            this.caNumbers.Name = "caNumbers";
-            this.caNumbers.ShortcutKeys = System.Windows.Forms.Keys.F9;
-            this.caNumbers.Size = new System.Drawing.Size(198, 22);
-            this.caNumbers.Text = "Sayılar";
-            // 
-            // BtnGenReport
-            // 
-            this.BtnGenReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnGenReport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnGenReport.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnGenReport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnGenReport.BorderColor = System.Drawing.Color.SlateBlue;
-            this.BtnGenReport.BorderRadius = 10;
-            this.BtnGenReport.BorderSize = 0;
-            this.BtnGenReport.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BtnGenReport.FlatAppearance.BorderSize = 0;
-            this.BtnGenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnGenReport.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
-            this.BtnGenReport.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnGenReport.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnGenReport.Location = new System.Drawing.Point(746, 113);
-            this.BtnGenReport.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
-            this.BtnGenReport.Name = "BtnGenReport";
-            this.BtnGenReport.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.BtnGenReport.Size = new System.Drawing.Size(250, 36);
-            this.BtnGenReport.TabIndex = 3;
-            this.BtnGenReport.Text = "Rapor Oluştur";
-            this.BtnGenReport.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnGenReport.TextColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnGenReport.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.BtnGenReport.UseVisualStyleBackColor = false;
-            this.BtnGenReport.Click += new System.EventHandler(this.BtnGenReport_Click);
-            // 
-            // BtnRemoveFolder
-            // 
-            this.BtnRemoveFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnRemoveFolder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnRemoveFolder.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnRemoveFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnRemoveFolder.BorderColor = System.Drawing.Color.SlateBlue;
-            this.BtnRemoveFolder.BorderRadius = 10;
-            this.BtnRemoveFolder.BorderSize = 0;
-            this.BtnRemoveFolder.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BtnRemoveFolder.FlatAppearance.BorderSize = 0;
-            this.BtnRemoveFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnRemoveFolder.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
-            this.BtnRemoveFolder.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnRemoveFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnRemoveFolder.Location = new System.Drawing.Point(746, 64);
-            this.BtnRemoveFolder.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
-            this.BtnRemoveFolder.Name = "BtnRemoveFolder";
-            this.BtnRemoveFolder.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.BtnRemoveFolder.Size = new System.Drawing.Size(250, 36);
-            this.BtnRemoveFolder.TabIndex = 2;
-            this.BtnRemoveFolder.Text = "Klasörü Kaldır";
-            this.BtnRemoveFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnRemoveFolder.TextColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnRemoveFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.BtnRemoveFolder.UseVisualStyleBackColor = false;
-            this.BtnRemoveFolder.Click += new System.EventHandler(this.BtnRemoveFolder_Click);
             // 
             // BtnAddFolder
             // 
@@ -622,7 +610,6 @@
         private System.Windows.Forms.ToolStripMenuItem systemThemeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem englishToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem turkishToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem tSWizardToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem donateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem startupToolStripMenuItem;

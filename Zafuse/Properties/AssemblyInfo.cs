@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Zafuse")]
 [assembly: AssemblyDescription("Zafuse - Multi INI File Content Analysis Software")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Türkay Software")]
+[assembly: AssemblyCompany("Türkaysoft")]
 [assembly: AssemblyProduct("Zafuse")]
 [assembly: AssemblyCopyright("© 2025-2026, Eray Türkay.")]
 [assembly: AssemblyTrademark("")]
@@ -30,6 +30,6 @@ using System.Runtime.InteropServices;
 //      Yapı Numarası
 //      Düzeltme
 //
-[assembly: AssemblyVersion("26.5.0.0")]
-[assembly: AssemblyFileVersion("26.5.0.0")]
+[assembly: AssemblyVersion("26.6.0.0")]
+[assembly: AssemblyFileVersion("26.6.0.0")]
 [assembly: NeutralResourcesLanguage("tr-TR")]

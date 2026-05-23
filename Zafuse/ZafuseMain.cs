@@ -1,11 +1,11 @@
 ﻿// ======================================================================================================
 // Zafuse - Multi INI File Content Analysis Software
 // © Copyright 2025-2026, Eray Türkay.
-// Publisher: Türkay Software
+// Publisher: Türkaysoft
 // Project Type: Open Source
 // License: MIT License
-// Website: https://www.turkaysoftware.com/zafuse
-// GitHub: https://github.com/turkaysoftware/zafuse
+// Website: https://turkaysoft.com
+// GitHub: https://github.com/turkaysoft/zafuse
 // ======================================================================================================
 
 using Microsoft.Win32;
@@ -16,9 +16,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,7 +80,6 @@ namespace Zafuse{
         // VARIABLES
         // ======================================================================================================
         private int startup_status;
-        private readonly string ts_wizard_name = "TS Wizard";
         // MAIN PROCCESS FIELDS
         // ======================================================================================================
         private readonly TS_Comparer TSComparer = new TS_Comparer();
@@ -276,7 +274,6 @@ namespace Zafuse{
                 { "Astel", @"E:\TSApps\Astel\bin\x64\Release\a_langs" },
                 { "Encryphix", @"E:\TSApps\Encryphix\bin\x64\Release\e_langs" },
                 { "Glow", @"E:\TSApps\Glow\bin\x64\Release\g_langs" },
-                { "TS Wizard", @"E:\TSApps\TSWizard\bin\x64\Release\tswizard_langs" },
                 { "VCardix", @"E:\TSApps\VCardix\bin\x64\Release\vc_langs" },
                 { "Vimera", @"E:\TSApps\Vimera\bin\x64\Release\v_langs" },
                 { "Yamira", @"E:\TSApps\Yamira\bin\x64\Release\y_langs" },
@@ -412,7 +409,7 @@ namespace Zafuse{
             }
             DataGridViewRow row = SelDGV.SelectedRows[0];
             string folderName = row.Cells["Name"].Value.ToString();
-            string[] defaultApps = { "Astel", "Encryphix", "Glow", "TSWizard", "VCardix", "Vimera", "Yamira", "Zafuse" };
+            string[] defaultApps = { "Astel", "Encryphix", "Glow", "VCardix", "Vimera", "Yamira", "Zafuse" };
             if (Program.debug_mode && defaultApps.Contains(folderName)){
                 TS_MessageBoxEngine.TS_MessageBox(this, 2, langObj.TSReadLangs("ZafuseMain", "zm_b_remove_default_msg"));
                 return;
@@ -756,8 +753,6 @@ namespace Zafuse{
                     TSImageRenderer(startupToolStripMenuItem, Properties.Resources.tm_startup_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(contentAnalysis, Properties.Resources.tm_analysis_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(checkForUpdatesToolStripMenuItem, Properties.Resources.tm_update_light, 0, ContentAlignment.MiddleRight);
-                    // TS WIZARD
-                    TSImageRenderer(tSWizardToolStripMenuItem, Properties.Resources.tm_ts_wizard_light, 0, ContentAlignment.MiddleRight);
                     // DONATE
                     TSImageRenderer(donateToolStripMenuItem, Properties.Resources.tm_donate_light, 0, ContentAlignment.MiddleRight);
                     // ABOUT
@@ -774,8 +769,6 @@ namespace Zafuse{
                     TSImageRenderer(startupToolStripMenuItem, Properties.Resources.tm_startup_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(contentAnalysis, Properties.Resources.tm_analysis_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(checkForUpdatesToolStripMenuItem, Properties.Resources.tm_update_dark, 0, ContentAlignment.MiddleRight);
-                    // TS WIZARD
-                    TSImageRenderer(tSWizardToolStripMenuItem, Properties.Resources.tm_ts_wizard_dark, 0, ContentAlignment.MiddleRight);
                     // DONATE
                     TSImageRenderer(donateToolStripMenuItem, Properties.Resources.tm_donate_dark, 0, ContentAlignment.MiddleRight);
                     // ABOUT
@@ -971,8 +964,6 @@ namespace Zafuse{
                 caCommentLines.Text = software_lang.TSReadLangs("HeaderAnalysisMode", "has_comment_lines");
                 // UPDATE CHECK
                 checkForUpdatesToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderMenu", "header_menu_update");
-                // TS WIZARD
-                tSWizardToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderMenu", "header_menu_ts_wizard");
                 // DONATE
                 donateToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderMenu", "header_menu_donate");
                 // ABOUT
@@ -1049,82 +1040,68 @@ namespace Zafuse{
                 software_setting_save.TSWriteSettings(ts_settings_container, "AnalysisStatus", analysis_result);
             }catch (Exception){ }
         }
-        // SOFTWARE OPERATION CONTROLLER MODULE
-        // ======================================================================================================
-        private static bool Software_operation_controller(string __target_software_path){
-            var exeFiles = Directory.GetFiles(__target_software_path, "*.exe");
-            var runned_process = Process.GetProcesses();
-            foreach (var exe_path in exeFiles){
-                string exe_name = Path.GetFileNameWithoutExtension(exe_path);
-                if (runned_process.Any(p => {
-                    try{
-                        return string.Equals(p.ProcessName, exe_name, StringComparison.OrdinalIgnoreCase);
-                    }catch{
-                        return false;
-                    }
-                })){
-                    return true;
-                }
-            }
-            return false;
-        }
-        // TS WIZARD STARTER MODE
-        // ======================================================================================================
-        private string[] Ts_wizard_starter_mode(){
-            string[] ts_wizard_exe_files = { "TSWizard_arm64.exe", "TSWizard_x64.exe", "TSWizard.exe" };
-            if (RuntimeInformation.OSArchitecture == Architecture.Arm64){
-                return new[] { ts_wizard_exe_files[0], ts_wizard_exe_files[1], ts_wizard_exe_files[2] }; // arm64 > x64 > default
-            }else if (Environment.Is64BitOperatingSystem){
-                return new[] { ts_wizard_exe_files[1], ts_wizard_exe_files[0], ts_wizard_exe_files[2] }; // x64 > arm64 > default
-            }else{
-                return new[] { ts_wizard_exe_files[2], ts_wizard_exe_files[1], ts_wizard_exe_files[0] }; // default > x64 > arm64
-            }
-        }
         // UPDATE CHECK ENGINE
         // ======================================================================================================
         private void CheckForUpdatesToolStripMenuItem_Click(object sender, EventArgs e){
             Task.Run(() => Software_update_check(1));
         }
-        public void Software_update_check(int _check_update_ui){
+        public async void Software_update_check(int _check_update_ui){
             try{
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 SetUpdateMenuEnabled(false);
-                if (!IsNetworkCheck()){
+                if (!await IsNetworkAvailable()){
                     if (_check_update_ui == 1){
                         TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_not_connection"), "\n\n"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
                     }
                     return;
                 }
-                using (WebClient getLastVersion = new WebClient()){
-                    string client_version_raw = TS_VersionParser.ParseUINormalize(Application.ProductVersion);
-                    string last_version_raw = TS_VersionParser.ParseUINormalize(getLastVersion.DownloadString(TS_LinkSystem.github_link_lv).Split('=')[1].Trim());
-                    Version client_ver = Version.Parse(client_version_raw);
-                    Version last_ver = Version.Parse(last_version_raw);
-                    if (client_ver < last_ver){
-                        string baseDir = Path.Combine(Directory.GetParent(Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).FullName).FullName);
-                        string ts_wizard_path = Ts_wizard_starter_mode().Select(name => Path.Combine(baseDir, name)).FirstOrDefault(File.Exists);
-                        if (!string.IsNullOrEmpty(ts_wizard_path) && File.Exists(ts_wizard_path)){
-                            if (!Software_operation_controller(Path.GetDirectoryName(ts_wizard_path))){
-                                DialogResult info_update = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_available_ts_wizard"), Application.ProductName, "\n\n", client_version_raw, "\n", last_version_raw, "\n\n", ts_wizard_name), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
-                                if (info_update == DialogResult.Yes){
-                                    Process.Start(new ProcessStartInfo { FileName = ts_wizard_path, WorkingDirectory = Path.GetDirectoryName(ts_wizard_path) });
-                                }
-                            }else{
-                                if (_check_update_ui == 1){
-                                    TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("HeaderHelp", "header_help_info_notification"), ts_wizard_name));
+                using (HttpClientHandler handler = new HttpClientHandler()){
+                    handler.UseProxy = false;
+                    using (HttpClient httpClient = new HttpClient(handler)){
+                        httpClient.Timeout = TimeSpan.FromSeconds(15);
+                        httpClient.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
+                        httpClient.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
+                        string versionUrl = TS_LinkSystem.github_link_lv;
+                        versionUrl += (versionUrl.Contains("?") ? "&" : "?") + "_ts=" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                        string response = await httpClient.GetStringAsync(versionUrl);
+                        string firstLine = response.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)[0];
+                        string client_version_raw = TS_VersionParser.ParseUINormalize(Application.ProductVersion);
+                        string last_version_raw = TS_VersionParser.ParseUINormalize(firstLine.Split(new[] { '=' }, 2)[1].Trim());
+                        Version client_ver = Version.Parse(client_version_raw);
+                        Version last_ver = Version.Parse(last_version_raw);
+                        if (client_ver < last_ver){
+                            DialogResult info_update = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_available"), Application.ProductName, "\n\n", client_version_raw, "\n", last_version_raw, "\n\n"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                            if (info_update == DialogResult.Yes){
+                                try{
+                                    string updaterPath = Path.Combine(Application.StartupPath, Program.updater_exe_name);
+                                    if (File.Exists(updaterPath)){
+                                        string procName = Path.GetFileNameWithoutExtension(updaterPath);
+                                        bool isRunning = Process.GetProcessesByName(procName).Length > 0;
+                                        if (!isRunning){
+                                            Process.Start(new ProcessStartInfo(updaterPath) { UseShellExecute = true, Arguments = $"-app={Application.ProductName}" });
+                                        }else{
+                                            TS_MessageBoxEngine.TS_MessageBox(this, 1, software_lang.TSReadLangs("SoftwareUpdate", "su_ts_updater_c_running"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                                        }
+                                        Application.Exit();
+                                        return;
+                                    }else{
+                                        TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_ts_updater_not_available"), Program.updater_exe_name), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                                        Process.Start(new ProcessStartInfo(TS_LinkSystem.github_link_lr) { UseShellExecute = true });
+                                        Application.Exit();
+                                        return;
+                                    }
+                                }catch (Exception ex){
+                                    Debug.WriteLine(ex, $"{Program.updater_exe_name} launch block.");
                                 }
                             }
-                        }else{
-                            DialogResult info_update = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_available"), Application.ProductName, "\n\n", client_version_raw, "\n", last_version_raw, "\n\n"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
-                            if (info_update == DialogResult.Yes)
-                                Process.Start(new ProcessStartInfo(TS_LinkSystem.github_link_lr) { UseShellExecute = true });
+                        }else if (_check_update_ui == 1){
+                            string update_msg = client_ver == last_ver ? string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_not_available"), Application.ProductName, "\n", client_version_raw) : string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_newer"), "\n\n", $"v{client_version_raw}");
+                            TS_MessageBoxEngine.TS_MessageBox(this, 1, update_msg, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
                         }
-                    }else if (_check_update_ui == 1){
-                        string update_msg = client_ver == last_ver ? string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_not_available"), Application.ProductName, "\n", client_version_raw) : string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_newer"), "\n\n", $"v{client_version_raw}");
-                        TS_MessageBoxEngine.TS_MessageBox(this, 1, update_msg, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
                     }
                 }
             }catch (Exception ex){
+                Debug.WriteLine(ex, "Software_update_check()");
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_error"), "\n\n", ex.Message), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
             }finally{
@@ -1137,29 +1114,6 @@ namespace Zafuse{
             }else{
                 checkForUpdatesToolStripMenuItem.Enabled = enabled;
             }
-        }
-        // TS WIZARD
-        // ======================================================================================================
-        private void TSWizardToolStripMenuItem_Click(object sender, EventArgs e){
-            try{
-                string baseDir = Path.Combine(Directory.GetParent(Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).FullName).FullName);
-                string ts_wizard_path = Ts_wizard_starter_mode().Select(name => Path.Combine(baseDir, name)).FirstOrDefault(File.Exists);
-                //
-                TSGetLangs software_lang = new TSGetLangs(lang_path);
-                //
-                if (ts_wizard_path != null){
-                    if (!Software_operation_controller(Path.GetDirectoryName(ts_wizard_path))){
-                        Process.Start(new ProcessStartInfo { FileName = ts_wizard_path, WorkingDirectory = Path.GetDirectoryName(ts_wizard_path) });
-                    }else{
-                        TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("HeaderHelp", "header_help_info_notification"), ts_wizard_name));
-                    }
-                }else{
-                    DialogResult ts_wizard_query = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("TSWizard", "tsw_content"), software_lang.TSReadLangs("HeaderMenu", "header_menu_ts_wizard"), Application.CompanyName, "\n\n", Application.ProductName, Application.CompanyName, "\n\n"), string.Format("{0} - {1}", Application.ProductName, ts_wizard_name));
-                    if (ts_wizard_query == DialogResult.Yes){
-                        Process.Start(new ProcessStartInfo(TS_LinkSystem.ts_wizard) { UseShellExecute = true });
-                    }
-                }
-            }catch (Exception){ }
         }
         // DONATE LINK
         // ======================================================================================================

@@ -66,6 +66,7 @@
     <Reference Include="System" />
     <Reference Include="System.Management" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -123,10 +124,8 @@
     <None Include="zafuse_images\ts_preloader\ts_preloader_2.jpg" />
     <None Include="zafuse_images\ts_preloader\ts_preloader.jpg" />
     <None Include="zafuse_images\zafuse_ui\ts_material\ts_close.png" />
-    <None Include="zafuse_images\zafuse_ui\theme_light\ct_website_light.png" />
     <None Include="zafuse_images\zafuse_ui\theme_light\ct_github_light.png" />
     <None Include="zafuse_images\zafuse_ui\theme_light\ct_donate_mc_light.png" />
-    <None Include="zafuse_images\zafuse_ui\theme_dark\ct_website_dark.png" />
     <None Include="zafuse_images\zafuse_ui\theme_dark\ct_github_dark.png" />
     <None Include="zafuse_images\zafuse_ui\theme_dark\ct_donate_mc_dark.png" />
   </ItemGroup>
