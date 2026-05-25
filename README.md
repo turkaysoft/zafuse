@@ -85,4 +85,4 @@ Zafuse offers a specialized toolkit to resolve complex file structures in second
 
 ## License
 
-This software is offered free of charge as part of the **Türkay Software solutions package** and is protected under the [**MIT License**](https://github.com/turkaysoft/zafuse?tab=MIT-1-ov-file).
+This software is offered free of charge as part of the **Türkaysoft solutions package** and is protected under the [**MIT License**](https://github.com/turkaysoft/zafuse?tab=MIT-1-ov-file).
