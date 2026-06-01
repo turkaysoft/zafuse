@@ -27,8 +27,6 @@ You can support this project by making a donation to help ensure its sustainabil
 * **Pure Performance:** Developed in **pure .NET** with **zero external library dependencies**, ensuring unrivaled scanning speed.
 * **Modern UI:** Sophisticated interface with Light, Dark, and System theme support for high readability.
 * **Multilingual:** It supports 15 different languages, primarily English. You can access the supported languages here: [Supported Languages](https://github.com/turkaysoft/zafuse/discussions/1)
-* **Portable & Lightweight:** Takes up only ~1.5 MB of space and runs with an incredibly low memory footprint (17-20 MB RAM).
-* **Truly Free:** High-end developer features provided at no cost, with no hidden paywalls.
 * **Built-in Update Mechanism:** It features a built-in smart update mechanism developed specifically by **Türkaysoft**.
 
 ---
