@@ -18,14 +18,14 @@ You can support this project by making a donation to help ensure its sustainabil
 
 ## Key Features
 
-* **Privacy First:** No data ever leaves your computer. All analysis is performed locally on your device.
+* **Privacy First:** Your data stays on your machine; no information is transferred to external servers.
+* **Pure Performance:** Developed exclusively in **C# and .NET Framework** with no external libraries or dependencies.
 * **Deep INI Comparison:** Audits keys, sections, and values across languages to find desynchronized data down to the specific line number.
 * **Specialized Audit Layers:** Leverages a custom engine to detect punctuation errors, quotation marks, and placeholder inconsistencies.
 * **Dynamic Customization:** Toggle analysis layers on-the-fly via **F6, F7, F8, F9, and F10** shortcuts during runtime.
 * **Ultra-Fast Scanning:** Capable of analyzing massive datasets (thousands of lines) in less than half a second.
 * **Professional Reporting:** Export detected inconsistencies and duplicate keys as rapid developer-focused debugging reports.
-* **Pure Performance:** Developed in **pure .NET** with **zero external library dependencies**, ensuring unrivaled scanning speed.
-* **Modern UI:** Sophisticated interface with Light, Dark, and System theme support for high readability.
+* **Modern UI:** Clean, intuitive interface compatible with Windows 11 design language, featuring Light, Dark, and System themes.
 * **Multilingual:** It supports 15 different languages, primarily English. You can access the supported languages here: [Supported Languages](https://github.com/turkaysoft/zafuse/discussions/1)
 * **Built-in Update Mechanism:** It features a built-in smart update mechanism developed specifically by **Türkaysoft**.
 
