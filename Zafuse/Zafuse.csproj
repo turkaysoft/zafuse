@@ -121,13 +121,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ZafuseLogo.ico" />
-    <None Include="zafuse_images\ts_preloader\ts_preloader_2.jpg" />
-    <None Include="zafuse_images\ts_preloader\ts_preloader.jpg" />
     <None Include="zafuse_images\zafuse_ui\ts_material\ts_close.png" />
     <None Include="zafuse_images\zafuse_ui\theme_light\ct_github_light.png" />
     <None Include="zafuse_images\zafuse_ui\theme_light\ct_donate_mc_light.png" />
     <None Include="zafuse_images\zafuse_ui\theme_dark\ct_github_dark.png" />
     <None Include="zafuse_images\zafuse_ui\theme_dark\ct_donate_mc_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="zafuse_images\ts_preloader\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -17,6 +17,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -87,6 +88,8 @@ namespace Zafuse{
         private readonly Dictionary<string, string> ManuelLangPaths = new Dictionary<string, string>();
         private readonly SemaphoreSlim _renderSemaphore = new SemaphoreSlim(1, 1);
         private bool _suppressSelectionChanged = false;
+        private bool _isFirstKeyNavigation = true;
+        private bool _isSelectionProcessing = false;
         private string selectedProccessPath = null;
         // ======================================================================================================
         // UI COLORS
@@ -192,8 +195,8 @@ namespace Zafuse{
         private void MainToolTip_Draw(object sender, DrawToolTipEventArgs e){ e.DrawBackground(); e.DrawBorder(); e.DrawText(); }
         // LOAD
         // ====================================================================================================== 
-        private async void ZafuseMain_Load(object sender, EventArgs e){
-            Text = TS_VersionEngine.TS_SofwareVersion(0);
+        private async void ZafuseMain_Load(object sender, EventArgs e){ 
+            Text = TS_VersionEngine.TS_SoftwareVersion(0);
             // LAUNCH PROCESS 
             // ====================================
             RunSoftwareEngine();
@@ -384,7 +387,7 @@ namespace Zafuse{
             int rowIndex = SelDGV.Rows.Add(item.Name, item.Path, item.IniCount, TS_FormatSize(item.TotalSizeBytes));
             SelDGV.ClearSelection();
             SelDGV.Rows[rowIndex].Selected = true;
-            SaveManuelPath(folderName, folderPath);
+                        SaveManuelPath(folderName, folderPath);
             TSComparer.LoadFolder(folderPath);
             await RenderResults();
             return true;
@@ -395,6 +398,68 @@ namespace Zafuse{
             if (_suppressSelectionChanged) return;
             if (SelDGV.SelectedRows.Count == 0) return;
             string selectedPath = SelDGV.SelectedRows[0].Cells["Path"].Value?.ToString();
+            if (string.IsNullOrEmpty(selectedPath)) return;
+            TSComparer.LoadFolder(selectedPath);
+            await RenderResults();
+        }
+        // FORM-LEVEL KEY DOWN
+        // ======================================================================================================
+        private void ZafuseMain_KeyDown(object sender, KeyEventArgs e){
+            if (_isSelectionProcessing){
+                e.Handled = true;
+                return;
+            }
+            if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) && !SelDGV.Focused){
+                if (this.ActiveControl is TextBox){
+                    return;
+                }
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                SelDGV.Focus();
+                SelDGV_KeyDown(SelDGV, e);
+            }
+        }
+        // SEL DGV KEYBOARD NAVIGATION
+        // ======================================================================================================
+        private async void SelDGV_KeyDown(object sender, KeyEventArgs e){
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down){
+                e.Handled = true;
+                if (_isSelectionProcessing) return;
+                int rowCount = SelDGV.Rows.Count;
+                if (rowCount == 0) return;
+                try{
+                    _isSelectionProcessing = true;
+                    if (_isFirstKeyNavigation || SelDGV.CurrentCell == null){
+                        _isFirstKeyNavigation = false;
+                        SelDGV.ClearSelection();
+                        SelDGV.Rows[0].Selected = true;
+                        SelDGV.CurrentCell = SelDGV.Rows[0].Cells[0];
+                        SelDGV.FirstDisplayedScrollingRowIndex = 0;
+                        await PerformSelDGVSelection(0);
+                        return;
+                    }
+                    int currentIndex = SelDGV.CurrentCell.RowIndex;
+                    int newIndex;
+                    if (e.KeyCode == Keys.Down){
+                        newIndex = (currentIndex + 1) % rowCount;
+                    }else{
+                        newIndex = (currentIndex - 1 + rowCount) % rowCount;
+                    }
+                    SelDGV.ClearSelection();
+                    SelDGV.Rows[newIndex].Selected = true;
+                    SelDGV.CurrentCell = SelDGV.Rows[newIndex].Cells[0];
+                    SelDGV.FirstDisplayedScrollingRowIndex = newIndex;
+                    await PerformSelDGVSelection(newIndex);
+                }finally{
+                    _isSelectionProcessing = false;
+                }
+            }
+        }
+        // SEL DGV SELECTION HELPER
+        // ======================================================================================================
+        private async Task PerformSelDGVSelection(int rowIndex){
+            if (rowIndex < 0 || rowIndex >= SelDGV.RowCount) return;
+            string selectedPath = SelDGV.Rows[rowIndex].Cells["Path"].Value?.ToString();
             if (string.IsNullOrEmpty(selectedPath)) return;
             TSComparer.LoadFolder(selectedPath);
             await RenderResults();
@@ -488,6 +553,22 @@ namespace Zafuse{
             TSGetLangs software_lang = new TSGetLangs(lang_path);
             string oldTitle = this.Text;
             this.Text = string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_t_analysis"), oldTitle);
+            //
+            string missingKeyText = software_lang.TSReadLangs("ZafuseMain", "zm_e_missing_key");
+            string duplicateKeyText = software_lang.TSReadLangs("ZafuseMain", "zm_e_repeat_key");
+            string sectionMismatchText = software_lang.TSReadLangs("ZafuseMain", "zm_e_different_section");
+            string placeholderErrorText = software_lang.TSReadLangs("ZafuseMain", "zm_e_placeholder");
+            string numberErrorText = software_lang.TSReadLangs("ZafuseMain", "zm_e_number");
+            string punctuationErrorText = software_lang.TSReadLangs("ZafuseMain", "zm_e_punctuation");
+            string quoteErrorText = software_lang.TSReadLangs("ZafuseMain", "zm_e_quote");
+            string commentMismatchText = software_lang.TSReadLangs("ZafuseMain", "zm_e_different_comment");
+            string lineCountDiffText = software_lang.TSReadLangs("ZafuseMain", "zm_e_different_row_count");
+            string pL = software_lang.TSReadLangs("ZafuseMain", "zm_ep_placeholder");
+            string missingKeyDetailFormat = software_lang.TSReadLangs("ZafuseMain", "zm_e_target_file_null");
+            string duplicateKeyDetailFormat = software_lang.TSReadLangs("ZafuseMain", "zm_e_file");
+            string commentDetailFormat = software_lang.TSReadLangs("ZafuseMain", "zm_e_different_files");
+            string lineCountDetailFormat = software_lang.TSReadLangs("ZafuseMain", "zm_e_row_total");
+            //
             try{
                 MainDGV.Rows.Clear();
                 int checkPlaceholders = 0, checkPunctuation = 0, checkQuotes = 0;
@@ -514,69 +595,102 @@ namespace Zafuse{
                 await Task.Run(() => TSComparer.LoadFolder(selectedProccessPath));
                 try{
                     var lineMap = TSComparer.GetKeyLineNumbers();
-                    int GetCommonLine(string key) => lineMap.ContainsKey(key) ? lineMap[key].Values.Min() : -1;
+                    // Get line number from first file that contains the key, or -1 if not found
+                    int GetFirstFileLine(string key){
+                        if (!lineMap.ContainsKey(key)) return -1;
+                        var firstFile = lineMap[key].FirstOrDefault();
+                        return firstFile.Value;
+                    }
+                    // Collect all rows first for batch update
+                    var rowsToAdd = new List<Action>();
                     // Missing keys
                     foreach (var kvp in TSComparer.GetMissingKeys()){
-                        this.Invoke(new Action(() => {
-                            MainDGVAddRowHelper(GetCommonLine(kvp.Key), AnalysisErrorType.MissingKey, kvp.Key, string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_target_file_null"), string.Join(", ", kvp.Value)), software_lang.TSReadLangs("ZafuseMain", "zm_e_missing_key"));
-                        }));
+                        int lineNum = GetFirstFileLine(kvp.Key);
+                        string details = string.Format(missingKeyDetailFormat, string.Join(", ", kvp.Value));
+                        rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.MissingKey, kvp.Key, details, missingKeyText));
                     }
-                    // Repeated keys
+                    // Duplicate keys
                     foreach (var kvp in TSComparer.GetDuplicateKeys()){
-                        foreach (var key in kvp.Value){
-                            this.Invoke(new Action(() => {
-                                MainDGVAddRowHelper(GetCommonLine(key), AnalysisErrorType.DuplicateKey, key, string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_file"), kvp.Key), software_lang.TSReadLangs("ZafuseMain", "zm_e_repeat_key"));
-                            }));
+                        foreach (var keyInfo in kvp.Value){
+                            if (keyInfo.Contains("[SectionMismatch:")){
+                                int openBracket = keyInfo.IndexOf('[');
+                                string pureKey = keyInfo.Substring(0, openBracket).Trim();
+                                string sectionInfo = keyInfo.Substring(openBracket).Replace("[SectionMismatch:", "").Replace("]", "").Trim();
+                                int lineNum = GetFirstFileLine(pureKey);
+                                string details = $"{string.Format(duplicateKeyDetailFormat, kvp.Key)} ({sectionInfo})";
+                                rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.SectionMismatch, pureKey, details, sectionMismatchText));
+                            }else{
+                                int lineNum = GetFirstFileLine(keyInfo);
+                                string details = string.Format(duplicateKeyDetailFormat, kvp.Key);
+                                rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.DuplicateKey, keyInfo, details, duplicateKeyText));
+                            }
                         }
                     }
                     // Section mismatches
                     foreach (var kvp in TSComparer.GetSectionMismatches()){
-                        var first = kvp.Value.First();
-                        int lineNum = GetCommonLine($"{first.Value}.{kvp.Key}");
-                        this.Invoke(new Action(() => {
-                            MainDGVAddRowHelper(lineNum, AnalysisErrorType.SectionMismatch, kvp.Key, string.Join(" | ", kvp.Value.Select(v => $"{v.Key}: {v.Value}")), software_lang.TSReadLangs("ZafuseMain", "zm_e_different_section"));
-                        }));
+                        int lineNum = GetFirstFileLine(kvp.Key);
+                        string sectionsInfo = string.Join(" | ", kvp.Value.Select(v => $"{v.Key}: {v.Value}"));
+                        rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.SectionMismatch, kvp.Key, sectionsInfo, sectionMismatchText));
                     }
-                    // Dynamic Content Analysis
+                    // Dynamic Content Analysis - RESPECT CHECKBOX STATES
                     var placeholders = TSComparer.GetPlaceholderMismatches(checkPlaceholders > 0, checkPunctuation > 0, checkQuotes > 0, checkNums);
                     foreach (var kvp in placeholders){
-                        this.Invoke(new Action(() => {
-                            var counts = kvp.Value.Values;
-                            var first = counts.First();
-                            List<string> errorParts = new List<string>();
-                            //
-                            if (counts.Any(c => c.Placeholders != first.Placeholders))
-                                errorParts.Add(software_lang.TSReadLangs("ZafuseMain", "zm_e_placeholder"));
-                            if (counts.Any(c => c.Numbers != first.Numbers))
-                                errorParts.Add(software_lang.TSReadLangs("ZafuseMain", "zm_e_number"));
-                            if (counts.Any(c => c.Punctuation != first.Punctuation))
-                                errorParts.Add(software_lang.TSReadLangs("ZafuseMain", "zm_e_punctuation"));
-                            if (counts.Any(c => c.Quotes != first.Quotes))
-                                errorParts.Add(software_lang.TSReadLangs("ZafuseMain", "zm_e_quote"));
-                            //
-                            string dynamicErrorTitle = string.Join(", ", errorParts);
-                            string pL = software_lang.TSReadLangs("ZafuseMain", "zm_ep_placeholder");
-                            string nL = software_lang.TSReadLangs("ZafuseMain", "zm_ep_number");
-                            //
-                            string detailText = string.Join(" | ", kvp.Value.Select(v => $"{v.Key}: {pL}: {v.Value.Placeholders} - {nL}: {v.Value.Numbers}"));
-                            MainDGVAddRowHelper(GetCommonLine(kvp.Key), AnalysisErrorType.PlaceholderSymbolError, kvp.Key, detailText, dynamicErrorTitle);
-                        }));
+                        int lineNum = GetFirstFileLine(kvp.Key);
+                        var counts = kvp.Value.Values;
+                        var first = counts.First();
+                        // Only report mismatches for enabled checks
+                        List<string> errorParts = new List<string>();
+                        if (checkPlaceholders > 0 && counts.Any(c => c.Placeholders != first.Placeholders))
+                            errorParts.Add(placeholderErrorText);
+                        if (checkNums && counts.Any(c => c.Numbers != first.Numbers))
+                            errorParts.Add(numberErrorText);
+                        if (checkPunctuation > 0 && counts.Any(c => c.Punctuation != first.Punctuation))
+                            errorParts.Add(punctuationErrorText);
+                        if (checkQuotes > 0 && counts.Any(c => c.Quotes != first.Quotes))
+                            errorParts.Add(quoteErrorText);
+                        // Skip if no actual mismatches (should not happen, but safety check)
+                        if (errorParts.Count == 0) continue;
+                        string dynamicErrorTitle = string.Join(", ", errorParts);
+                        // Only show metrics that are actually checked
+                        var metricParts = new List<string>();
+                        foreach (var v in kvp.Value){
+                            var metrics = new List<string>();
+                            if (checkPlaceholders > 0)
+                                metrics.Add($"{pL}:{v.Value.Placeholders}");
+                            if (checkNums)
+                                metrics.Add($"{numberErrorText}:{v.Value.Numbers}");
+                            if (checkPunctuation > 0)
+                                metrics.Add($"{punctuationErrorText}:{v.Value.Punctuation}");
+                            if (checkQuotes > 0)
+                                metrics.Add($"{quoteErrorText}:{v.Value.Quotes}");
+                            metricParts.Add($"{v.Key}: {string.Join(" ", metrics)}");
+                        }
+                        string detailText = string.Join(" | ", metricParts);
+                        rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.PlaceholderSymbolError, kvp.Key, detailText, dynamicErrorTitle));
                     }
                     // Comment check
                     if (checkComments){
-                        foreach (var kvp in TSComparer.GetCommentDifferences()){
-                            this.Invoke(new Action(() => {
-                                MainDGVAddRowHelper(kvp.Key, AnalysisErrorType.CommentMismatch, string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_row"), kvp.Key), string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_different_files"), string.Join(", ", kvp.Value.Keys)), software_lang.TSReadLangs("ZafuseMain", "zm_e_different_comment"));
-                            }));
+                        var commentDifferences = TSComparer.GetCommentDifferences();
+                        if (commentDifferences.Count > 0){
+                            foreach (var kvp in commentDifferences){
+                                string details = string.Format(commentDetailFormat, string.Join(", ", kvp.Value.Keys));
+                                rowsToAdd.Add(() => MainDGVAddRowHelper(kvp.Key, AnalysisErrorType.CommentMismatch, string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_row"), kvp.Key), details, commentMismatchText));
+                            }
                         }
                     }
-                    // Line different check
+                    // Line count difference
                     foreach (var kvp in TSComparer.GetLineCountDifferences()){
+                        string details = string.Format(lineCountDetailFormat, kvp.Value);
+                        rowsToAdd.Add(() => MainDGVAddRowHelper(-1, AnalysisErrorType.LineCountDifference, kvp.Key, details, lineCountDiffText));
+                    }
+                    // Batch update UI - single Invoke for all rows
+                    if (rowsToAdd.Count > 0){
                         this.Invoke(new Action(() => {
-                            MainDGVAddRowHelper(kvp.Value, AnalysisErrorType.LineCountDifference, kvp.Key, string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_row_total"), kvp.Value), software_lang.TSReadLangs("ZafuseMain", "zm_e_different_row_count"));
+                            foreach (var addRow in rowsToAdd){
+                                addRow();
+                            }
                         }));
                     }
-
                 }catch (Exception ex){
                     this.Invoke(new Action(() => {
                         TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("ZafuseMain", "zm_e_error"), "\n\n", ex.Message));
@@ -665,7 +779,7 @@ namespace Zafuse{
                 });
                 AnalysisGenRepList.AddRange(reportLines);
                 // FOOTER
-                AnalysisGenRepList.Add(Environment.NewLine + Application.ProductName + " " + software_lang.TSReadLangs("ZafuseGenReport", "zgr_version") + " " + TS_VersionEngine.TS_SofwareVersion(1));
+                AnalysisGenRepList.Add(Environment.NewLine + Application.ProductName + " " + software_lang.TSReadLangs("ZafuseGenReport", "zgr_version") + " " + TS_VersionEngine.TS_SoftwareVersion(1));
                 AnalysisGenRepList.Add(TS_SoftwareCopyrightDate.ts_scd_preloader);
                 AnalysisGenRepList.Add(software_lang.TSReadLangs("ZafuseGenReport", "zgr_process_time") + " " + DateTime.Now.ToString("dd.MM.yyyy - HH:mm:ss"));
                 AnalysisGenRepList.Add(software_lang.TSReadLangs("ZafuseGenReport", "zgr_website") + " " + TS_LinkSystem.website_link);
@@ -1059,7 +1173,7 @@ namespace Zafuse{
                     handler.UseProxy = false;
                     using (HttpClient httpClient = new HttpClient(handler)){
                         httpClient.Timeout = TimeSpan.FromSeconds(15);
-                        httpClient.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
+                        httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
                         httpClient.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
                         string versionUrl = TS_LinkSystem.github_link_lv;
                         versionUrl += (versionUrl.Contains("?") ? "&" : "?") + "_ts=" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();

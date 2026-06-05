@@ -7,8 +7,6 @@ using System.Text.RegularExpressions;
 
 namespace Zafuse{
     internal class AnalyzerModule{
-        // Struct to hold counts of dynamic content within strings
-        // Used for comparison across translation files
         public struct ContentCounts{
             public int Placeholders; // Count of placeholder tokens like {0}, %s
             public int Punctuation;  // Count of punctuation characters
@@ -30,19 +28,14 @@ namespace Zafuse{
         }
         public class TS_FileParser{
             public string Files { get; private set; } // File name without extension
-            public Dictionary<string, string> KeySectionMap { get; private set; } // Key - Section mapping
-            public Dictionary<string, int> KeyLineMap { get; private set; } // Key - Line number mapping
-            public HashSet<string> DuplicateKeys { get; private set; } // Tracks duplicate keys in the same file
-            public Dictionary<string, string> KeyValueMap { get; private set; } // Key - Value mapping
-            public Dictionary<int, string> Comments { get; private set; } // Line number - comment text
-            public int TotalLineCount { get; private set; } // Total number of lines in file
+            public Dictionary<string, string> KeySectionMap { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, string> KeyValueMap { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, int> KeyLineMap { get; private set; } = new Dictionary<string, int>();
+            public Dictionary<int, string> Comments { get; private set; } = new Dictionary<int, string>();
+            public HashSet<string> DuplicateKeys { get; private set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            public int TotalLineCount { get; private set; }
             public TS_FileParser(string filePath){
                 Files = Path.GetFileNameWithoutExtension(filePath);
-                KeySectionMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                KeyLineMap = new Dictionary<string, int>();
-                DuplicateKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                KeyValueMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                Comments = new Dictionary<int, string>();
                 ParseFile(filePath);
             }
             private void ParseFile(string filePath){
@@ -51,11 +44,15 @@ namespace Zafuse{
                 string[] allLines = Regex.Split(fileContent, "\r\n|\r|\n");
                 TotalLineCount = allLines.Length;
                 string currentSection = "Main";
+                HashSet<string> rawKeysInFile = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 for (int i = 0; i < allLines.Length; i++){
                     string line = allLines[i].Trim();
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     // Track comment lines
-                    if (line.StartsWith(";")) { Comments[i + 1] = line; continue; }
+                    if (line.StartsWith(";")){
+                        Comments[i + 1] = line;
+                        continue;
+                    }
                     // Track section headers [Section]
                     if (line.StartsWith("[") && line.Contains("]")){
                         currentSection = line.Substring(1, line.IndexOf(']') - 1).Trim();
@@ -65,10 +62,12 @@ namespace Zafuse{
                     if (line.Contains("=")){
                         int equalIdx = line.IndexOf('=');
                         string key = line.Substring(0, equalIdx).Trim();
-                        string value = line.Substring(equalIdx + 1).Split(';')[0].Trim(); // remove inline comment
+                        string value = line.Substring(equalIdx + 1).Trim();
                         string fullKey = $"{currentSection}.{key}";
-                        if (KeySectionMap.ContainsKey(fullKey)) DuplicateKeys.Add(fullKey);
-                        else{
+                        if (rawKeysInFile.Contains(key)){
+                            DuplicateKeys.Add($"{key} [SectionMismatch: {currentSection}]");
+                        }else{
+                            rawKeysInFile.Add(key);
                             KeySectionMap[fullKey] = currentSection;
                             KeyValueMap[fullKey] = value;
                             KeyLineMap[fullKey] = i + 1;
@@ -96,15 +95,17 @@ namespace Zafuse{
                     foreach (var kvp in parser.KeySectionMap){
                         if (!KeyPresenceMap.ContainsKey(kvp.Key)) KeyPresenceMap[kvp.Key] = new HashSet<string>();
                         KeyPresenceMap[kvp.Key].Add(parser.Files);
-                        string rawKey = kvp.Key.Contains('.') ? kvp.Key.Substring(kvp.Key.IndexOf('.') + 1) : kvp.Key;
-                        if (!SectionMismatchMap.ContainsKey(rawKey)) SectionMismatchMap[rawKey] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        SectionMismatchMap[rawKey][parser.Files] = kvp.Value;
+                        string fullKey = kvp.Key;
+                        if (!SectionMismatchMap.ContainsKey(fullKey)) SectionMismatchMap[fullKey] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        SectionMismatchMap[fullKey][parser.Files] = kvp.Value;
                     }
                 }
             }
             // Compare placeholders, punctuation, quotes, and numbers across all files
             // Returns only keys with mismatches
             public Dictionary<string, Dictionary<string, ContentCounts>> GetPlaceholderMismatches(bool chkPlc, bool chkPnc, bool chkQt, bool chkNum){
+                if (!chkPlc && !chkPnc && !chkQt && !chkNum)
+                    return new Dictionary<string, Dictionary<string, ContentCounts>>();
                 var result = new Dictionary<string, Dictionary<string, ContentCounts>>();
                 var allKeys = Parsers.SelectMany(p => p.KeyValueMap.Keys).Distinct();
                 foreach (string key in allKeys){
@@ -124,6 +125,8 @@ namespace Zafuse{
             private static readonly Regex PlaceholderCurly = new Regex(@"\{[^{}]+\}", RegexOptions.Compiled);
             // Regex for detecting printf-style placeholders %s, %d, %1$d, etc.
             private static readonly Regex PlaceholderPercent = new Regex(@"%(\d+\$)?[-+0#]*\d*(\.\d+)?[dfsuxX]", RegexOptions.Compiled);
+            // Regex for detecting escaped quotes
+            private static readonly Regex EscapedQuotes = new Regex(@"(?<!\\)[\""']", RegexOptions.Compiled);
             // Count placeholders, punctuation, quotes, and numbers in a string
             // Placeholders are removed before counting numbers and punctuation
             private ContentCounts GetContentCounts(string value, bool chkPlc, bool chkPnc, bool chkQt, bool chkNum){
@@ -139,26 +142,36 @@ namespace Zafuse{
                 if (chkPnc)
                     c.Punctuation = temp.Count(ch => new[] { '.', ',', '!', '?', ':', ';' }.Contains(ch));
                 if (chkQt)
-                    c.Quotes = temp.Count(ch => ch == '\"' || ch == '\'');
+                    c.Quotes = EscapedQuotes.Matches(temp).Count;
                 if (chkNum)
-                    c.Numbers = Regex.Matches(temp, @"\d+").Count;
+                    c.Numbers = Regex.Matches(temp, @"\b\d+(?:\.\d+)?\b").Count;
                 return c;
             }
             // Compare total line counts across files
             public Dictionary<string, int> GetLineCountDifferences(){
                 if (Parsers.Count == 0) return new Dictionary<string, int>();
-                var lineCounts = Parsers.ToDictionary(p => p.Files, p => p.TotalLineCount);
-                int commonCount = lineCounts.Values.GroupBy(v => v).OrderByDescending(g => g.Count()).First().Key;
-                return lineCounts.Where(kvp => kvp.Value != commonCount).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                int referenceCount = Parsers.First().TotalLineCount;
+                return Parsers.Where(p => p.TotalLineCount != referenceCount).ToDictionary(p => p.Files, p => p.TotalLineCount);
             }
             // Compare comments across files for differences
+            // Numbers in comments are ignored during comparison
             public Dictionary<int, Dictionary<string, string>> GetCommentDifferences(){
                 var result = new Dictionary<int, Dictionary<string, string>>();
                 var allLines = Parsers.SelectMany(p => p.Comments.Keys).Distinct().OrderBy(x => x);
                 foreach (var line in allLines){
                     var lineComments = new Dictionary<string, string>();
-                    foreach (var parser in Parsers) if (parser.Comments.TryGetValue(line, out var comment)) lineComments[parser.Files] = comment;
-                    if (lineComments.Values.Distinct().Count() > 1) result[line] = lineComments;
+                    foreach (var parser in Parsers){
+                        if (parser.Comments.TryGetValue(line, out var comment)){
+                            lineComments[parser.Files] = comment;
+                        }
+                    }
+                    if (lineComments.Count >= 2)
+                    {
+                        var normalizedComments = lineComments.ToDictionary(kvp => kvp.Key, kvp => Regex.Replace(kvp.Value, @"\d+", ""));
+                        if (normalizedComments.Values.Distinct().Count() > 1){
+                            result[line] = lineComments;
+                        }
+                    }
                 }
                 return result;
             }
