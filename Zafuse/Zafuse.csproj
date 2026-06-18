@@ -75,12 +75,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TSModules.cs" />
-    <Compile Include="TSPreloader.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TSPreloader.Designer.cs">
-      <DependentUpon>TSPreloader.cs</DependentUpon>
-    </Compile>
     <Compile Include="ZafuseAbout.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -127,8 +121,6 @@
     <None Include="zafuse_images\zafuse_ui\theme_dark\ct_github_dark.png" />
     <None Include="zafuse_images\zafuse_ui\theme_dark\ct_donate_mc_dark.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="zafuse_images\ts_preloader\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

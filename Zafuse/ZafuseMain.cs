@@ -763,7 +763,7 @@ namespace Zafuse{
                 AnalysisGenRepList.Add(string.Format(software_lang.TSReadLangs("ZafuseGenReport", "zgr_analysis_path"), selectedProccessPath));
                 AnalysisGenRepList.Add(Environment.NewLine + new string('-', 100));
                 // MAIN - BACKGROUND TASK
-                var reportLines = await Task.Run(() =>{
+                var reportLines = await Task.Run(() => {
                     var current_lines = new List<string>();
                     for (int i = 0; i < MainDGV.Rows.Count; i++){
                         int lineLength = (i == MainDGV.Rows.Count - 1) ? 100 : 25;
@@ -796,8 +796,11 @@ namespace Zafuse{
                     if (saveDlg.ShowDialog() == DialogResult.OK){
                         using (var fs = new FileStream(saveDlg.FileName, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
                         using (var sw = new StreamWriter(fs, Encoding.UTF8)){
-                            foreach (var line in AnalysisGenRepList){
-                                await sw.WriteLineAsync(line);
+                            for (int i = 0; i < AnalysisGenRepList.Count; i++){
+                                if (i == AnalysisGenRepList.Count - 1)
+                                    await sw.WriteAsync(AnalysisGenRepList[i]);
+                                else
+                                    await sw.WriteLineAsync(AnalysisGenRepList[i]);
                             }
                         }
                         var response_success = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("ZafuseGenReport", "zgr_save_success") + Environment.NewLine + Environment.NewLine + software_lang.TSReadLangs("ZafuseGenReport", "zgr_save_info_open"), Application.ProductName, saveDlg.FileName));

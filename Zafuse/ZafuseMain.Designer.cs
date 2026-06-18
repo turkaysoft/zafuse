@@ -73,10 +73,10 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.BackPanel = new System.Windows.Forms.Panel();
-            this.SelDGV = new System.Windows.Forms.DataGridView();
-            this.MainDGV = new System.Windows.Forms.DataGridView();
             this.BtnGenReport = new Zafuse.TSCustomButton();
+            this.SelDGV = new System.Windows.Forms.DataGridView();
             this.BtnRemoveFolder = new Zafuse.TSCustomButton();
+            this.MainDGV = new System.Windows.Forms.DataGridView();
             this.BtnAddFolder = new Zafuse.TSCustomButton();
             this.HeaderMenu.SuspendLayout();
             this.BackPanel.SuspendLayout();
@@ -339,7 +339,7 @@
             // 
             this.donateToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.donateToolStripMenuItem.Name = "donateToolStripMenuItem";
-            this.donateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.donateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.D)));
             this.donateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
             this.donateToolStripMenuItem.Text = "Donate";
@@ -373,6 +373,34 @@
             this.BackPanel.Padding = new System.Windows.Forms.Padding(5, 5, 8, 5);
             this.BackPanel.Size = new System.Drawing.Size(1008, 577);
             this.BackPanel.TabIndex = 1;
+            // 
+            // BtnGenReport
+            // 
+            this.BtnGenReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnGenReport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnGenReport.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnGenReport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.BtnGenReport.BorderColor = System.Drawing.Color.SlateBlue;
+            this.BtnGenReport.BorderRadius = 10;
+            this.BtnGenReport.BorderSize = 0;
+            this.BtnGenReport.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnGenReport.FlatAppearance.BorderSize = 0;
+            this.BtnGenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BtnGenReport.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
+            this.BtnGenReport.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnGenReport.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnGenReport.Location = new System.Drawing.Point(746, 113);
+            this.BtnGenReport.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
+            this.BtnGenReport.Name = "BtnGenReport";
+            this.BtnGenReport.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.BtnGenReport.Size = new System.Drawing.Size(250, 36);
+            this.BtnGenReport.TabIndex = 3;
+            this.BtnGenReport.Text = "Rapor Oluştur";
+            this.BtnGenReport.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnGenReport.TextColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnGenReport.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.BtnGenReport.UseVisualStyleBackColor = false;
+            this.BtnGenReport.Click += new System.EventHandler(this.BtnGenReport_Click);
             // 
             // SelDGV
             // 
@@ -430,6 +458,34 @@
             this.SelDGV.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SelDGV_CellClick);
             this.SelDGV.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SelDGV_KeyDown);
             // 
+            // BtnRemoveFolder
+            // 
+            this.BtnRemoveFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnRemoveFolder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnRemoveFolder.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
+            this.BtnRemoveFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.BtnRemoveFolder.BorderColor = System.Drawing.Color.SlateBlue;
+            this.BtnRemoveFolder.BorderRadius = 10;
+            this.BtnRemoveFolder.BorderSize = 0;
+            this.BtnRemoveFolder.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnRemoveFolder.FlatAppearance.BorderSize = 0;
+            this.BtnRemoveFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BtnRemoveFolder.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
+            this.BtnRemoveFolder.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnRemoveFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnRemoveFolder.Location = new System.Drawing.Point(746, 64);
+            this.BtnRemoveFolder.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
+            this.BtnRemoveFolder.Name = "BtnRemoveFolder";
+            this.BtnRemoveFolder.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.BtnRemoveFolder.Size = new System.Drawing.Size(250, 36);
+            this.BtnRemoveFolder.TabIndex = 2;
+            this.BtnRemoveFolder.Text = "Klasörü Kaldır";
+            this.BtnRemoveFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnRemoveFolder.TextColor = System.Drawing.Color.WhiteSmoke;
+            this.BtnRemoveFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.BtnRemoveFolder.UseVisualStyleBackColor = false;
+            this.BtnRemoveFolder.Click += new System.EventHandler(this.BtnRemoveFolder_Click);
+            // 
             // MainDGV
             // 
             this.MainDGV.AllowUserToAddRows = false;
@@ -485,62 +541,6 @@
             this.MainDGV.Size = new System.Drawing.Size(984, 360);
             this.MainDGV.TabIndex = 4;
             this.MainDGV.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.MainDGV_CellFormatting);
-            // 
-            // BtnGenReport
-            // 
-            this.BtnGenReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnGenReport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnGenReport.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnGenReport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnGenReport.BorderColor = System.Drawing.Color.SlateBlue;
-            this.BtnGenReport.BorderRadius = 10;
-            this.BtnGenReport.BorderSize = 0;
-            this.BtnGenReport.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BtnGenReport.FlatAppearance.BorderSize = 0;
-            this.BtnGenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnGenReport.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
-            this.BtnGenReport.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnGenReport.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnGenReport.Location = new System.Drawing.Point(746, 113);
-            this.BtnGenReport.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
-            this.BtnGenReport.Name = "BtnGenReport";
-            this.BtnGenReport.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.BtnGenReport.Size = new System.Drawing.Size(250, 36);
-            this.BtnGenReport.TabIndex = 3;
-            this.BtnGenReport.Text = "Rapor Oluştur";
-            this.BtnGenReport.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnGenReport.TextColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnGenReport.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.BtnGenReport.UseVisualStyleBackColor = false;
-            this.BtnGenReport.Click += new System.EventHandler(this.BtnGenReport_Click);
-            // 
-            // BtnRemoveFolder
-            // 
-            this.BtnRemoveFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnRemoveFolder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnRemoveFolder.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(32)))), ((int)(((byte)(81)))));
-            this.BtnRemoveFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnRemoveFolder.BorderColor = System.Drawing.Color.SlateBlue;
-            this.BtnRemoveFolder.BorderRadius = 10;
-            this.BtnRemoveFolder.BorderSize = 0;
-            this.BtnRemoveFolder.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BtnRemoveFolder.FlatAppearance.BorderSize = 0;
-            this.BtnRemoveFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnRemoveFolder.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
-            this.BtnRemoveFolder.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnRemoveFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnRemoveFolder.Location = new System.Drawing.Point(746, 64);
-            this.BtnRemoveFolder.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
-            this.BtnRemoveFolder.Name = "BtnRemoveFolder";
-            this.BtnRemoveFolder.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.BtnRemoveFolder.Size = new System.Drawing.Size(250, 36);
-            this.BtnRemoveFolder.TabIndex = 2;
-            this.BtnRemoveFolder.Text = "Klasörü Kaldır";
-            this.BtnRemoveFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnRemoveFolder.TextColor = System.Drawing.Color.WhiteSmoke;
-            this.BtnRemoveFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.BtnRemoveFolder.UseVisualStyleBackColor = false;
-            this.BtnRemoveFolder.Click += new System.EventHandler(this.BtnRemoveFolder_Click);
             // 
             // BtnAddFolder
             // 
