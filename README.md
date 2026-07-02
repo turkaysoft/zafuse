@@ -82,6 +82,7 @@ You can support this project by making a donation to help ensure its sustainabil
 | `F11` | Check Updates |
 | `F12` | About |
 | `CTRL + Alt + D` | Donate Page |
+| `ESC` | Clear Selection |
 
 ---
 
