@@ -20,6 +20,7 @@ You can support this project by making a donation to help ensure its sustainabil
 
 * **Privacy First:** Your data stays on your machine; no information is transferred to external servers.
 * **Pure Performance:** Developed exclusively in **C# and .NET Framework** with no external libraries or dependencies.
+* **Portable:** No installation required. Just download it, extract all files from the ZIP, select the appropriate architecture, and run it.
 * **Deep INI Comparison:** Audits keys, sections, and values across languages to find desynchronized data down to the specific line number.
 * **Specialized Audit Layers:** Leverages a custom engine to detect punctuation errors, quotation marks, and placeholder inconsistencies.
 * **Dynamic Customization:** Toggle analysis layers on-the-fly via **F6, F7, F8, F9, and F10** shortcuts during runtime.
