@@ -200,7 +200,7 @@ namespace Zafuse{
             // LAUNCH PROCESS 
             // ====================================
             RunSoftwareEngine();
-            // SETUP
+            // SETUP DGV
             // ====================================
             SetupDGV();
             // LOAD DATA
@@ -279,8 +279,9 @@ namespace Zafuse{
                 { "Glow", @"E:\TSApps\Glow\bin\x64\Release\g_langs" },
                 { "VCardix", @"E:\TSApps\VCardix\bin\x64\Release\vc_langs" },
                 { "Vimera", @"E:\TSApps\Vimera\bin\x64\Release\v_langs" },
+                { "Walpa", @"E:\TSApps\Walpa\bin\x64\Release\w_langs" },
                 { "Yamira", @"E:\TSApps\Yamira\bin\x64\Release\y_langs" },
-                { "Zafuse", @"E:\TSApps\Zafuse\bin\x64\Release\z_langs" }
+                { "Zafuse", @"E:\TSApps\Zafuse\bin\x64\Release\z_langs" },
             };
             if (!Program.debug_mode){
                 defaultPaths.Clear();
@@ -395,18 +396,33 @@ namespace Zafuse{
         // SEL DGV SELECTION
         // ======================================================================================================
         private async void SelDGV_CellClick(object sender, DataGridViewCellEventArgs e){
+            if (e.RowIndex < 0) return;
             if (_suppressSelectionChanged) return;
             if (SelDGV.SelectedRows.Count == 0) return;
             string selectedPath = SelDGV.SelectedRows[0].Cells["Path"].Value?.ToString();
             if (string.IsNullOrEmpty(selectedPath)) return;
+            // if (selectedPath == selectedProccessPath) return;
             TSComparer.LoadFolder(selectedPath);
             await RenderResults();
         }
         // FORM-LEVEL KEY DOWN
         // ======================================================================================================
-        private void ZafuseMain_KeyDown(object sender, KeyEventArgs e){
+        private async void ZafuseMain_KeyDown(object sender, KeyEventArgs e){
             if (_isSelectionProcessing){
                 e.Handled = true;
+                return;
+            }
+            if (e.KeyCode == Keys.Escape){
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                if (MainDGV.Focused || this.ActiveControl == MainDGV){
+                    MainDGV.ClearSelection();
+                }else{
+                    SelDGV.ClearSelection();
+                    selectedProccessPath = null;
+                    _isFirstKeyNavigation = true;
+                    await RenderResults();
+                }
                 return;
             }
             if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) && !SelDGV.Focused){
@@ -739,10 +755,10 @@ namespace Zafuse{
                         e.CellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentOrange");
                         break;
                     case AnalysisErrorType.LineCountDifference:
-                        e.CellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
+                        e.CellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                         break;
                     default:
-                        e.CellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "DataGridFEColor");
+                        e.CellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
                         break;
                 }
             }
@@ -898,29 +914,29 @@ namespace Zafuse{
                 // OTHER PAGE DYNAMIC UI
                 Zafuse_other_page_dynamic_ui();
                 // HEADER
-                header_colors[0] = TS_ThemeEngine.ColorMode(theme, "HeaderBGColorMain");
-                header_colors[1] = TS_ThemeEngine.ColorMode(theme, "HeaderFEColorMain");
-                header_colors[2] = TS_ThemeEngine.ColorMode(theme, "AccentColor");
+                header_colors[0] = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor2");
+                header_colors[1] = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
+                header_colors[2] = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                 HeaderMenu.Renderer = new HeaderMenuColors();
                 // TOOLTIP
-                MainToolTip.ForeColor = TS_ThemeEngine.ColorMode(theme, "HeaderFEColor");
-                MainToolTip.BackColor = TS_ThemeEngine.ColorMode(theme, "HeaderBGColor");
+                MainToolTip.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
+                MainToolTip.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor");
                 // HEADER MENU
-                var bg = TS_ThemeEngine.ColorMode(theme, "HeaderBGColor");
-                var fg = TS_ThemeEngine.ColorMode(theme, "HeaderFEColor");
+                var bg = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor");
+                var fg = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
                 HeaderMenu.ForeColor = fg;
                 HeaderMenu.BackColor = bg;
                 SetMenuStripColors(HeaderMenu, bg, fg);
                 // UI
-                BackColor = TS_ThemeEngine.ColorMode(theme, "BGColor");
-                BackPanel.BackColor = TS_ThemeEngine.ColorMode(theme, "BGColor");
+                BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor");
+                BackPanel.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor");
                 //
                 foreach (Control ui_buttons in BackPanel.Controls){
                     if (ui_buttons is Button ui_button){
                         ui_button.ForeColor = TS_ThemeEngine.ColorMode(theme, "FontColor2");
-                        ui_button.BackColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
-                        ui_button.FlatAppearance.BorderColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
-                        ui_button.FlatAppearance.MouseDownBackColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
+                        ui_button.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
+                        ui_button.FlatAppearance.BorderColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
+                        ui_button.FlatAppearance.MouseDownBackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                         ui_button.FlatAppearance.MouseOverBackColor = TS_ThemeEngine.ColorMode(theme, "AccentColorHover");
                     }
                 }
@@ -928,24 +944,24 @@ namespace Zafuse{
                 Color headerBG = TS_ThemeEngine.ColorMode(theme, "DataGridHeaderBG");
                 Color headerFE = TS_ThemeEngine.ColorMode(theme, "DataGridHeaderFE");
                 //
-                SelDGV.BackgroundColor = TS_ThemeEngine.ColorMode(theme, "DataGridBGColor");
+                SelDGV.BackgroundColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor2");
                 SelDGV.GridColor = TS_ThemeEngine.ColorMode(theme, "DataGridColor");
-                SelDGV.DefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "DataGridBGColor");
-                SelDGV.DefaultCellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "DataGridFEColor");
-                SelDGV.AlternatingRowsDefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "DataGridAlternatingColor");
-                SelDGV.DefaultCellStyle.SelectionBackColor = TS_ThemeEngine.ColorMode(theme, "DataGridSelectionColor");
+                SelDGV.DefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor2");
+                SelDGV.DefaultCellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
+                SelDGV.AlternatingRowsDefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor");
+                SelDGV.DefaultCellStyle.SelectionBackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                 SelDGV.DefaultCellStyle.SelectionForeColor = TS_ThemeEngine.ColorMode(theme, "DataGridHeaderFE");
                 SelDGV.ColumnHeadersDefaultCellStyle.BackColor = headerBG;
                 SelDGV.ColumnHeadersDefaultCellStyle.ForeColor = headerFE;
                 SelDGV.ColumnHeadersDefaultCellStyle.SelectionBackColor = headerBG;
                 SelDGV.ColumnHeadersDefaultCellStyle.SelectionForeColor = headerFE;
                 //
-                MainDGV.BackgroundColor = TS_ThemeEngine.ColorMode(theme, "DataGridBGColor");
+                MainDGV.BackgroundColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor2");
                 MainDGV.GridColor = TS_ThemeEngine.ColorMode(theme, "DataGridColor");
-                MainDGV.DefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "DataGridBGColor");
-                MainDGV.DefaultCellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "DataGridFEColor");
-                MainDGV.AlternatingRowsDefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "DataGridAlternatingColor");
-                MainDGV.DefaultCellStyle.SelectionBackColor = TS_ThemeEngine.ColorMode(theme, "DataGridSelectionColor");
+                MainDGV.DefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor2");
+                MainDGV.DefaultCellStyle.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
+                MainDGV.AlternatingRowsDefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_BGColor");
+                MainDGV.DefaultCellStyle.SelectionBackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                 MainDGV.DefaultCellStyle.SelectionForeColor = TS_ThemeEngine.ColorMode(theme, "DataGridHeaderFE");
                 MainDGV.ColumnHeadersDefaultCellStyle.BackColor = headerBG;
                 MainDGV.ColumnHeadersDefaultCellStyle.ForeColor = headerFE;
@@ -986,7 +1002,7 @@ namespace Zafuse{
         private void Zafuse_other_page_dynamic_ui(){
             try{
                 var zafuse_other_pages = new (string name, Func<object> createTool, Action<object> applySettings)[]{
-                    ("zafuse_about", () => new ZafuseAbout(), tool => ((ZafuseAbout)tool).About_preloader()),
+                    ("zafuse_about", () => new ZafuseAbout(), tool => ((ZafuseAbout)tool).About_Preloader()),
                 };
                 foreach (var (toolName, createTool, applySettings) in zafuse_other_pages){
                     try{
