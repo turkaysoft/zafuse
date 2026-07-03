@@ -33,7 +33,7 @@ You can support this project by making a donation to help ensure its sustainabil
 
 ## Interface Preview
 
-<img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/755ceab1-c3f3-41cd-b356-28567c970aa3" />
+<img width="1010" height="633" alt="Zafuse UI" src="https://github.com/user-attachments/assets/521f6cb1-816f-4c18-94e0-b49f7dd5d6c8" />
 
 ---
 
