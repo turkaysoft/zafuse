@@ -16,7 +16,7 @@ namespace Zafuse{
             //
             PanelHeader.Parent = ImageAbout;
             CloseAboutBtn.Parent = PanelHeader;
-            AboutTable.RowTemplate.Height = (int)(24 * this.DeviceDpi / 96f);
+            AboutTable.RowTemplate.Height = (int)(28 * this.DeviceDpi / 96f);
             AboutTable.Columns.Add("LangName", "Language");
             AboutTable.Columns.Add("LangTranslator", "Translator");
             AboutTable.Columns[0].Width = (int)(110 * this.DeviceDpi / 96f);
@@ -83,7 +83,7 @@ namespace Zafuse{
                 //
                 foreach (Control ui_buttons in PanelTxt.Controls){
                     if (ui_buttons is Button about_button){
-                        about_button.ForeColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "FontColor2");
+                        about_button.ForeColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "DataGridHeaderFE");
                         about_button.BackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_AccentColor");
                         about_button.FlatAppearance.BorderColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_AccentColor");
                         about_button.FlatAppearance.MouseDownBackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_AccentColor");
@@ -102,9 +102,9 @@ namespace Zafuse{
                 AboutTable.AlternatingRowsDefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_BGColor");
                 AboutTable.ColumnHeadersDefaultCellStyle.BackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_AccentColor");
                 AboutTable.ColumnHeadersDefaultCellStyle.SelectionBackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_BGColor2");
-                AboutTable.ColumnHeadersDefaultCellStyle.ForeColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "FontColor2");
+                AboutTable.ColumnHeadersDefaultCellStyle.ForeColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "DataGridHeaderFE");
                 AboutTable.DefaultCellStyle.SelectionBackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_BGColor2");
-                AboutTable.DefaultCellStyle.SelectionForeColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "FontColor2");
+                AboutTable.DefaultCellStyle.SelectionForeColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "DataGridHeaderFE");
                 //
                 CloseAboutBtn.BackColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_CloseBG");
                 CloseAboutBtn.FlatAppearance.BorderColor = TS_ThemeEngine.ColorMode(ZafuseMain.theme, "TSBT_CloseBG");

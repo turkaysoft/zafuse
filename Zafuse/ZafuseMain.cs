@@ -243,7 +243,7 @@ namespace Zafuse{
             //
             foreach (var tableMod in new[] { SelDGV, MainDGV }){
                 foreach (DataGridViewColumn columnPadding in tableMod.Columns){
-                    columnPadding.DefaultCellStyle.Padding = new Padding(ScaleDPI(3));
+                    columnPadding.DefaultCellStyle.Padding = new Padding(ScaleDPI(5));
                 }
             }
         }
@@ -933,7 +933,7 @@ namespace Zafuse{
                 //
                 foreach (Control ui_buttons in BackPanel.Controls){
                     if (ui_buttons is Button ui_button){
-                        ui_button.ForeColor = TS_ThemeEngine.ColorMode(theme, "FontColor2");
+                        ui_button.ForeColor = TS_ThemeEngine.ColorMode(theme, "DataGridHeaderFE");
                         ui_button.BackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                         ui_button.FlatAppearance.BorderColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                         ui_button.FlatAppearance.MouseDownBackColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
@@ -1018,15 +1018,16 @@ namespace Zafuse{
         }
         // LANGUAGES SETTINGS
         // ======================================================================================================
+        private ToolStripMenuItem selected_lang = null;
         private void Select_lang_active(object target_lang){
-            ToolStripMenuItem selected_lang = null;
+            if (target_lang == null)
+                return;
+            ToolStripMenuItem clicked_lang = (ToolStripMenuItem)target_lang;
+            if (selected_lang == clicked_lang)
+                return;
             Select_lang_deactive();
-            if (target_lang != null){
-                if (selected_lang != (ToolStripMenuItem)target_lang){
-                    selected_lang = (ToolStripMenuItem)target_lang;
-                    selected_lang.Checked = true;
-                }
-            }
+            selected_lang = clicked_lang;
+            selected_lang.Checked = true;
         }
         private void Select_lang_deactive(){
             foreach (ToolStripMenuItem disabled_lang in languageToolStripMenuItem.DropDownItems){
@@ -1124,15 +1125,16 @@ namespace Zafuse{
         }
         // STARTUP SETINGS
         // ======================================================================================================
+        private ToolStripMenuItem selected_startup_mode = null;
         private void Select_startup_mode_active(object target_startup_mode){
-            ToolStripMenuItem selected_startup_mode = null;
+            if (target_startup_mode == null)
+                return;
+            ToolStripMenuItem clicked_startup_mode = (ToolStripMenuItem)target_startup_mode;
+            if (selected_startup_mode == clicked_startup_mode)
+                return;
             Select_startup_mode_deactive();
-            if (target_startup_mode != null){
-                if (selected_startup_mode != (ToolStripMenuItem)target_startup_mode){
-                    selected_startup_mode = (ToolStripMenuItem)target_startup_mode;
-                    selected_startup_mode.Checked = true;
-                }
-            }
+            selected_startup_mode = clicked_startup_mode;
+            selected_startup_mode.Checked = true;
         }
         private void Select_startup_mode_deactive(){
             foreach (ToolStripMenuItem disabled_startup in startupToolStripMenuItem.DropDownItems){

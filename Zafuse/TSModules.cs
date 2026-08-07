@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Net.NetworkInformation;
 using System.Net.Http;
+using System.Diagnostics;
 
 namespace Zafuse{
     internal class TSModules{
@@ -452,8 +453,19 @@ namespace Zafuse{
         };
         public static string TSPreloaderSetDefaultLanguage(string ui_lang){
             bool anyLanguageFileExists = AllLanguageFiles.Values.Any(File.Exists);
-            bool isUiLangValid = !string.IsNullOrEmpty(ui_lang) && AllLanguageFiles.ContainsKey(ui_lang) && File.Exists(AllLanguageFiles[ui_lang]);
-            return anyLanguageFileExists && isUiLangValid ? ui_lang : "en";
+            if (!anyLanguageFileExists) return "en";
+            if (!string.IsNullOrEmpty(ui_lang)){
+                if (AllLanguageFiles.ContainsKey(ui_lang) && File.Exists(AllLanguageFiles[ui_lang])){
+                    return ui_lang;
+                }
+                if (ui_lang.Length >= 2){
+                    string twoLetter = ui_lang.Substring(0, 2);
+                    if (AllLanguageFiles.ContainsKey(twoLetter) && File.Exists(AllLanguageFiles[twoLetter])){
+                        return twoLetter;
+                    }
+                }
+            }
+            return "en";
         }
         public static List<string> AvailableLanguages = AllLanguageFiles.Values.Where(filePath => File.Exists(filePath)).ToList();
         // READ LANG CLASS
@@ -524,66 +536,80 @@ namespace Zafuse{
         public class TS_ThemeEngine{
             // LIGHT THEME COLORS
             // ====================================
-            public static readonly Dictionary<string, Color> LightTheme = new Dictionary<string, Color>{
+            public static readonly Dictionary<string, string> LightTheme = new Dictionary<string, string>{
                 // BG & PANELS
-                { "TSBT_BGColor", Color.FromArgb(236, 242, 248) },
-                { "TSBT_BGColor2", Color.White },
+                { "TSBT_BGColor", "#ECF2F8" },
+                { "TSBT_BGColor2", "#FFFFFF" },
                 // ACCENT COLORS
-                { "TSBT_AccentColor", Color.FromArgb(158, 32, 81) },
-                { "AccentColorHover", Color.FromArgb(184, 36, 93) },
+                { "TSBT_AccentColor", "#9E2051" },
+                { "AccentColorHover", "#B8245D" },
                 // COLOR PALETTE / STATUS COLORS
-                { "AccentBlue", Color.FromArgb(54, 95, 146) },
-                { "AccentPurple", Color.FromArgb(118, 85, 177) },
-                { "AccentRed", Color.FromArgb(207, 24, 0) },
-                { "AccentGreen", Color.FromArgb(28, 122, 25) },
-                { "AccentOrange", Color.FromArgb(155, 85, 0) },
+                { "AccentBlue", "#365F92" },
+                { "AccentPurple", "#7655B1" },
+                { "AccentRed", "#CF1800" },
+                { "AccentGreen", "#1C7A19" },
+                { "AccentOrange", "#9B5500" },
                 // FOREGROUND / TEXT
-                { "TSBT_LabelColor1", Color.FromArgb(51, 51, 51) },
-                { "TSBT_LabelColor2", Color.FromArgb(100, 100, 100) },
-                { "FontColor2", Color.White },
-                { "DataGridFEColor2", Color.White },
+                { "TSBT_LabelColor1", "#16191d" },
+                { "TSBT_LabelColor2", "#646464" },
                 // BORDERS, GRIDS & TABLES
-                { "DataGridColor", Color.FromArgb(226, 226, 226) },
-                { "DataGridHeaderBG", Color.FromArgb(158, 32, 81) },
-                { "DataGridHeaderFE", Color.White },
+                { "DataGridColor", "#d1d7df" },
+                { "DataGridHeaderBG", "#9E2051" },
+                { "DataGridHeaderFE", "#FFFFFF" },
                 // TRANSPARENCIES / ALPHAS
-                { "TSBT_CloseBG", Color.FromArgb(25, 255, 255, 255) },
-                { "TSBT_CloseBGHover", Color.FromArgb(50, 255, 255, 255) }
+                { "TSBT_CloseBG", "#19FFFFFF" },
+                { "TSBT_CloseBGHover", "#32FFFFFF" }
             };
             // DARK THEME COLORS
             // ====================================
-            public static readonly Dictionary<string, Color> DarkTheme = new Dictionary<string, Color>{
+            public static readonly Dictionary<string, string> DarkTheme = new Dictionary<string, string>{
                 // BG & PANELS
-                { "TSBT_BGColor", Color.FromArgb(27, 30, 34) },
-                { "TSBT_BGColor2", Color.FromArgb(34, 38, 44) },
+                { "TSBT_BGColor", "#0d0f12" },
+                { "TSBT_BGColor2", "#16191d" },
                 // ACCENT COLORS
-                { "TSBT_AccentColor", Color.FromArgb(211, 104, 159) },
-                { "AccentColorHover", Color.FromArgb(211, 113, 164) },
+                { "TSBT_AccentColor", "#D3689F" },
+                { "AccentColorHover", "#D371A4" },
                 // COLOR PALETTE / STATUS COLORS
-                { "AccentBlue", Color.FromArgb(88, 153, 233) },
-                { "AccentPurple", Color.FromArgb(164, 118, 243) },
-                { "AccentRed", Color.FromArgb(255, 77, 77) },
-                { "AccentGreen", Color.FromArgb(38, 187, 33) },
-                { "AccentOrange", Color.FromArgb(245, 136, 6) },
+                { "AccentBlue", "#5899E9" },
+                { "AccentPurple", "#A476F3" },
+                { "AccentRed", "#FF4D4D" },
+                { "AccentGreen", "#26BB21" },
+                { "AccentOrange", "#F58806" },
                 // FOREGROUND / TEXT
-                { "TSBT_LabelColor1", Color.WhiteSmoke },
-                { "TSBT_LabelColor2", Color.FromArgb(176, 184, 196) },
-                { "FontColor2", Color.FromArgb(27, 30, 34) },
+                { "TSBT_LabelColor1", "#F5F5F5" },
+                { "TSBT_LabelColor2", "#c3cbd6" },
                 // BORDERS, GRIDS & TABLES
-                { "DataGridColor", Color.FromArgb(42, 47, 53) },
-                { "DataGridHeaderBG", Color.FromArgb(211, 104, 159) },
-                { "DataGridHeaderFE", Color.FromArgb(34, 38, 44) },
+                { "DataGridColor", "#293036" },
+                { "DataGridHeaderBG", "#D3689F" },
+                { "DataGridHeaderFE", "#16191d" },
                 // TRANSPARENCIES / ALPHAS
-                { "TSBT_CloseBG", Color.FromArgb(75, 34, 38, 44) },
-                { "TSBT_CloseBGHover", Color.FromArgb(75, 27, 30, 34) }
+                { "TSBT_CloseBG", "#4B16191D" },
+                { "TSBT_CloseBGHover", "#4B0D0F12" }
             };
+            // HEX TO ARGB
+            // ====================================
+            public static Color HexToARGB(string hex){
+                if (string.IsNullOrWhiteSpace(hex)){
+                    Debug.WriteLine(new ArgumentException("The hex code cannot be empty or null.", nameof(hex)));
+                }
+                //
+                string s = hex.Trim().TrimStart('#');
+                if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) s = s.Substring(2);
+                //
+                if (s.Length == 3) s = $"FF{s[0]}{s[0]}{s[1]}{s[1]}{s[2]}{s[2]}";
+                else if (s.Length == 4) s = $"{s[0]}{s[0]}{s[1]}{s[1]}{s[2]}{s[2]}{s[3]}{s[3]}";
+                else if (s.Length == 6) s = "FF" + s;
+                else if (s.Length != 8) Debug.WriteLine(new FormatException($"Invalid Hex format: '{hex}'"));
+                //
+                return Color.FromArgb((int)Convert.ToUInt32(s, 16));
+            }
             // THEME SWITCHER
             // ====================================
             public static Color ColorMode(int theme, string key){
                 if (theme == 0){
-                    return DarkTheme.ContainsKey(key) ? DarkTheme[key] : Color.Black;
+                    return DarkTheme.ContainsKey(key) ? HexToARGB(DarkTheme[key]) : Color.Black;
                 }else if (theme == 1){
-                    return LightTheme.ContainsKey(key) ? LightTheme[key] : Color.White;
+                    return LightTheme.ContainsKey(key) ? HexToARGB(LightTheme[key]) : Color.White;
                 }
                 return Color.White;
             }
