@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Zafuse{
     internal class AnalyzerModule{
@@ -12,8 +13,13 @@ namespace Zafuse{
             public int Punctuation;  // Count of punctuation characters
             public int Quotes;       // Count of single or double quotes
             public int Numbers;      // Count of numeric sequences
+            public string PlaceholderSignature;
+            public string NumberSignature;
             // Override Equals to compare ContentCounts by value
-            public override bool Equals(object obj) => obj is ContentCounts other && Placeholders == other.Placeholders && Punctuation == other.Punctuation && Quotes == other.Quotes && Numbers == other.Numbers;
+            public override bool Equals(object obj) => obj is ContentCounts other &&
+                Placeholders == other.Placeholders && Punctuation == other.Punctuation && Quotes == other.Quotes && Numbers == other.Numbers &&
+                string.Equals(PlaceholderSignature, other.PlaceholderSignature, StringComparison.Ordinal) &&
+                string.Equals(NumberSignature, other.NumberSignature, StringComparison.Ordinal);
             // Override GetHashCode to match Equals
             public override int GetHashCode(){
                 unchecked{
@@ -22,9 +28,18 @@ namespace Zafuse{
                     hash = hash * 23 + Punctuation.GetHashCode();
                     hash = hash * 23 + Quotes.GetHashCode();
                     hash = hash * 23 + Numbers.GetHashCode();
+                    hash = hash * 23 + (PlaceholderSignature ?? string.Empty).GetHashCode();
+                    hash = hash * 23 + (NumberSignature ?? string.Empty).GetHashCode();
                     return hash;
                 }
             }
+        }
+        public class IniEntry{
+            public string Section { get; set; }
+            public string Key { get; set; }
+            public string Value { get; set; }
+            public int Line { get; set; }
+            public string FullKey => $"{Section}.{Key}";
         }
         public class TS_FileParser{
             public string Files { get; private set; } // File name without extension
@@ -33,6 +48,7 @@ namespace Zafuse{
             public Dictionary<string, int> KeyLineMap { get; private set; } = new Dictionary<string, int>();
             public Dictionary<int, string> Comments { get; private set; } = new Dictionary<int, string>();
             public HashSet<string> DuplicateKeys { get; private set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            public List<IniEntry> Entries { get; private set; } = new List<IniEntry>();
             public int TotalLineCount { get; private set; }
             public TS_FileParser(string filePath){
                 Files = Path.GetFileNameWithoutExtension(filePath);
@@ -40,11 +56,10 @@ namespace Zafuse{
             }
             private void ParseFile(string filePath){
                 if (!File.Exists(filePath)) return;
-                string fileContent = File.ReadAllText(filePath, Encoding.UTF8);
-                string[] allLines = Regex.Split(fileContent, "\r\n|\r|\n");
-                TotalLineCount = allLines.Length;
-                string currentSection = "Main";
-                HashSet<string> rawKeysInFile = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                 string[] allLines = File.ReadAllLines(filePath, Encoding.UTF8);
+                 TotalLineCount = allLines.Length;
+                 string currentSection = "Main";
+                 HashSet<string> fullKeysInFile = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 for (int i = 0; i < allLines.Length; i++){
                     string line = allLines[i].Trim();
                     if (string.IsNullOrWhiteSpace(line)) continue;
@@ -54,21 +69,24 @@ namespace Zafuse{
                         continue;
                     }
                     // Track section headers [Section]
-                    if (line.StartsWith("[") && line.Contains("]")){
-                        currentSection = line.Substring(1, line.IndexOf(']') - 1).Trim();
-                        continue;
+                     if (line.StartsWith("[") && line.EndsWith("]")){
+                         string section = line.Substring(1, line.Length - 2).Trim();
+                         if (section.Length > 0) currentSection = section;
+                         continue;
                     }
                     // Track key=value lines
-                    if (line.Contains("=")){
-                        int equalIdx = line.IndexOf('=');
-                        string key = line.Substring(0, equalIdx).Trim();
-                        string value = line.Substring(equalIdx + 1).Trim();
-                        string fullKey = $"{currentSection}.{key}";
-                        if (rawKeysInFile.Contains(key)){
-                            DuplicateKeys.Add($"{key} [SectionMismatch: {currentSection}]");
-                        }else{
-                            rawKeysInFile.Add(key);
-                            KeySectionMap[fullKey] = currentSection;
+                     if (line.Contains("=")){
+                         int equalIdx = line.IndexOf('=');
+                         string key = line.Substring(0, equalIdx).Trim();
+                         string value = line.Substring(equalIdx + 1).Trim();
+                         if (key.Length == 0) continue;
+                         string fullKey = $"{currentSection}.{key}";
+                         if (fullKeysInFile.Contains(fullKey)){
+                             DuplicateKeys.Add(fullKey);
+                         }else{
+                             fullKeysInFile.Add(fullKey);
+                             Entries.Add(new IniEntry{ Section = currentSection, Key = key, Value = value, Line = i + 1 });
+                             KeySectionMap[fullKey] = currentSection;
                             KeyValueMap[fullKey] = value;
                             KeyLineMap[fullKey] = i + 1;
                         }
@@ -87,17 +105,18 @@ namespace Zafuse{
             }
             // Load all .ini files from folder and build comparison maps
             public void LoadFolder(string folderPath){
-                if (!Directory.Exists(folderPath)) return;
                 Parsers.Clear(); KeyPresenceMap.Clear(); SectionMismatchMap.Clear();
+                if (!Directory.Exists(folderPath)) return;
                 foreach (string file in Directory.GetFiles(folderPath, "*.ini")){
                     TS_FileParser parser = new TS_FileParser(file);
                     Parsers.Add(parser);
-                    foreach (var kvp in parser.KeySectionMap){
-                        if (!KeyPresenceMap.ContainsKey(kvp.Key)) KeyPresenceMap[kvp.Key] = new HashSet<string>();
-                        KeyPresenceMap[kvp.Key].Add(parser.Files);
-                        string fullKey = kvp.Key;
-                        if (!SectionMismatchMap.ContainsKey(fullKey)) SectionMismatchMap[fullKey] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        SectionMismatchMap[fullKey][parser.Files] = kvp.Value;
+                    foreach (var group in parser.Entries.GroupBy(e => e.Key, StringComparer.OrdinalIgnoreCase)){
+                        string key = group.Key;
+                        if (!KeyPresenceMap.ContainsKey(key)) KeyPresenceMap[key] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        KeyPresenceMap[key].Add(parser.Files);
+                        if (!SectionMismatchMap.ContainsKey(key)) SectionMismatchMap[key] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        string sections = string.Join(" | ", group.Select(e => e.Section).Distinct(StringComparer.OrdinalIgnoreCase));
+                        SectionMismatchMap[key][parser.Files] = sections;
                     }
                 }
             }
@@ -107,12 +126,13 @@ namespace Zafuse{
                 if (!chkPlc && !chkPnc && !chkQt && !chkNum)
                     return new Dictionary<string, Dictionary<string, ContentCounts>>();
                 var result = new Dictionary<string, Dictionary<string, ContentCounts>>();
-                var allKeys = Parsers.SelectMany(p => p.KeyValueMap.Keys).Distinct();
+                var allKeys = Parsers.SelectMany(p => p.Entries.Select(e => e.Key)).Distinct(StringComparer.OrdinalIgnoreCase);
                 foreach (string key in allKeys){
                     var counts = new Dictionary<string, ContentCounts>();
                     foreach (var parser in Parsers){
-                        if (parser.KeyValueMap.TryGetValue(key, out string value)){
-                            counts[parser.Files] = GetContentCounts(value, chkPlc, chkPnc, chkQt, chkNum);
+                         IniEntry entry = parser.Entries.FirstOrDefault(e => string.Equals(e.Key, key, StringComparison.OrdinalIgnoreCase));
+                         if (entry != null){
+                             counts[parser.Files] = GetContentCounts(entry.Value, chkPlc, chkPnc, chkQt, chkNum);
                         }
                     }
                     if (counts.Values.Distinct().Count() > 1){
@@ -124,9 +144,9 @@ namespace Zafuse{
             // Regex for detecting placeholders {0}, {name}, etc.
             private static readonly Regex PlaceholderCurly = new Regex(@"\{[^{}]+\}", RegexOptions.Compiled);
             // Regex for detecting printf-style placeholders %s, %d, %1$d, etc.
-            private static readonly Regex PlaceholderPercent = new Regex(@"%(\d+\$)?[-+0#]*\d*(\.\d+)?[dfsuxX]", RegexOptions.Compiled);
+            private static readonly Regex PlaceholderPercent = new Regex(@"%(\d+\$)?[-+0#]*\d*(\.\d+)?(?:hh|h|ll|l|L|z|j|t)?[diouxXeEfFgGaAcspn]|%%", RegexOptions.Compiled);
             // Regex for detecting escaped quotes
-            private static readonly Regex EscapedQuotes = new Regex(@"(?<!\\)[\""']", RegexOptions.Compiled);
+            
             // Count placeholders, punctuation, quotes, and numbers in a string
             // Placeholders are removed before counting numbers and punctuation
             private ContentCounts GetContentCounts(string value, bool chkPlc, bool chkPnc, bool chkQt, bool chkNum){
@@ -134,18 +154,75 @@ namespace Zafuse{
                 string temp = value;
                 var cM = PlaceholderCurly.Matches(value);   // curly placeholders
                 var pM = PlaceholderPercent.Matches(value); // percent placeholders
-                if (chkPlc)
-                    c.Placeholders = cM.Count + pM.Count;
+                if (chkPlc){
+                     c.Placeholders = cM.Count + pM.Count;
+                    // Translators may reorder arguments (for example {1} before {0}); compare the token set, not display order.
+                    c.PlaceholderSignature = string.Join("|", cM.Cast<Match>().Concat(pM.Cast<Match>()).Select(m => m.Value).OrderBy(x => x, StringComparer.Ordinal));
+                }
                 // Remove placeholders to avoid double-counting numbers inside them
                 foreach (Match m in cM) temp = temp.Replace(m.Value, " ");
                 foreach (Match m in pM) temp = temp.Replace(m.Value, " ");
-                if (chkPnc)
-                    c.Punctuation = temp.Count(ch => new[] { '.', ',', '!', '?', ':', ';' }.Contains(ch));
-                if (chkQt)
-                    c.Quotes = EscapedQuotes.Matches(temp).Count;
-                if (chkNum)
-                    c.Numbers = Regex.Matches(temp, @"\b\d+(?:\.\d+)?\b").Count;
+                if (chkPnc){
+                    c.Punctuation = GetProtectedPunctuation(value, cM.Cast<Match>().Concat(pM.Cast<Match>())).Length;
+                }
+                if (chkQt){
+                    // Use the raw value so an apostrophe directly before a placeholder (French "d'{2}") keeps its context
+                    c.Quotes = CountUnbalancedQuotes(value);
+                }
+                if (chkNum){
+                    MatchCollection numberMatches = Regex.Matches(temp, @"\b\d+(?:\.\d+)?\b");
+                    c.NumberSignature = string.Join("|", numberMatches.Cast<Match>().Select(m => m.Value));
+                    c.Numbers = numberMatches.Count;
+                }
                 return c;
+            }
+            private static int CountUnbalancedQuotes(string value){
+                int quoteCount = 0;
+                for (int i = 0; i < value.Length; i++){
+                    char current = value[i];
+                    if (current == '\'' || current == '\u2018' || current == '\u2019'){
+                        // Latin contractions and elisions: l'emplacement, n'ont, d'{2}, user's
+                        char prevChar = i > 0 ? value[i - 1] : '\0';
+                        char nextChar = i + 1 < value.Length ? value[i + 1] : '\0';
+                        bool apostrophe = IsLatinLetter(prevChar) && (IsLatinLetter(nextChar) || nextChar == '{' || nextChar == '%');
+                        if (apostrophe) continue;
+                    }
+                    if (IsQuoteCharacter(current)) quoteCount++;
+                }
+                return quoteCount % 2;
+            }
+            private static bool IsLatinLetter(char value){
+                return (value >= 'A' && value <= 'Z') ||
+                    (value >= 'a' && value <= 'z') ||
+                    (value >= '\u00C0' && value <= '\u024F');
+            }
+            private static bool IsQuoteCharacter(char current){
+                return "\"\'\u00AB\u00BB\u2018\u2019\u201C\u201D\u201E\u201F\u3008\u3009\u300A\u300B\u300C\u300D\u300E\u300F\u301D\u301E\u301F".Contains(current);
+            }
+            private static string GetProtectedPunctuation(string value, IEnumerable<Match> placeholderMatches){
+                HashSet<int> punctuationIndexes = new HashSet<int>();
+                foreach (Match match in placeholderMatches){
+                    int before = match.Index - 1;
+                    while (before >= 0 && char.IsWhiteSpace(value[before])) before--;
+                    if (before >= 0 && IsStructuralPunctuation(value[before])) punctuationIndexes.Add(before);
+                    int after = match.Index + match.Length;
+                    while (after < value.Length && char.IsWhiteSpace(value[after])) after++;
+                    if (after < value.Length && IsStructuralPunctuation(value[after])) punctuationIndexes.Add(after);
+                }
+                return new string(punctuationIndexes.OrderBy(i => i).Select(i => value[i]).ToArray());
+            }
+            private static bool IsStructuralPunctuation(char value){
+                if ("{}()\u002D\u2010\u2011\u2012\u2013\u2014\u2212".Contains(value)) return false;
+                if ("'\"\u00AB\u00BB\u2018\u2019\u201C\u201D\u201E\u201F\u3008\u3009\u300A\u300B\u300C\u300D\u300E\u300F\u3010\u3011".Contains(value)) return false;
+                if (".,!?:;\u060C\u00A1\u00BF\u3001\u3002\uFF01\uFF0C\uFF1F\uFF1A\u0964\u0965\u061F\u061B".Contains(value)) return false;
+                UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(value);
+                return category == UnicodeCategory.ConnectorPunctuation ||
+                    category == UnicodeCategory.DashPunctuation ||
+                    category == UnicodeCategory.OpenPunctuation ||
+                    category == UnicodeCategory.ClosePunctuation ||
+                    category == UnicodeCategory.InitialQuotePunctuation ||
+                    category == UnicodeCategory.FinalQuotePunctuation ||
+                    category == UnicodeCategory.OtherPunctuation;
             }
             // Compare total line counts across files
             public Dictionary<string, int> GetLineCountDifferences(){
@@ -165,9 +242,14 @@ namespace Zafuse{
                             lineComments[parser.Files] = comment;
                         }
                     }
+                    if (lineComments.Count != Parsers.Count)
+                    {
+                        result[line] = lineComments;
+                        continue;
+                    }
                     if (lineComments.Count >= 2)
                     {
-                        var normalizedComments = lineComments.ToDictionary(kvp => kvp.Key, kvp => Regex.Replace(kvp.Value, @"\d+", ""));
+                        var normalizedComments = lineComments.ToDictionary(kvp => kvp.Key, kvp => NormalizeComment(kvp.Value));
                         if (normalizedComments.Values.Distinct().Count() > 1){
                             result[line] = lineComments;
                         }
@@ -175,13 +257,19 @@ namespace Zafuse{
                 }
                 return result;
             }
+            private static string NormalizeComment(string comment){
+                string normalized = Regex.Replace(Regex.Replace(comment, @"\d+", ""), @"\s+", " ").Trim().TrimStart(';').Trim();
+                if (normalized.IndexOf("Lang File", StringComparison.OrdinalIgnoreCase) >= 0)
+                    return "Lang File";
+                return normalized;
+            }
             // Return line numbers of all keys in each file
             public Dictionary<string, Dictionary<string, int>> GetKeyLineNumbers(){
                 var result = new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
                 foreach (var parser in Parsers){
-                    foreach (var kvp in parser.KeyLineMap){
-                        if (!result.ContainsKey(kvp.Key)) result[kvp.Key] = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                        result[kvp.Key][parser.Files] = kvp.Value;
+                    foreach (var entry in parser.Entries){
+                        if (!result.ContainsKey(entry.Key)) result[entry.Key] = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                        if (!result[entry.Key].ContainsKey(parser.Files)) result[entry.Key][parser.Files] = entry.Line;
                     }
                 }
                 return result;
@@ -204,7 +292,9 @@ namespace Zafuse{
             public Dictionary<string, Dictionary<string, string>> GetSectionMismatches(){
                 var result = new Dictionary<string, Dictionary<string, string>>();
                 foreach (var kvp in SectionMismatchMap){
-                    if (kvp.Value.Values.Distinct().Count() > 1) result[kvp.Key] = kvp.Value;
+                    if (kvp.Value.Values.Any(v => v.Contains("|")) ||
+                        (kvp.Value.Count > 1 && kvp.Value.Values.Distinct(StringComparer.OrdinalIgnoreCase).Count() > 1))
+                        result[kvp.Key] = kvp.Value;
                 }
                 return result;
             }

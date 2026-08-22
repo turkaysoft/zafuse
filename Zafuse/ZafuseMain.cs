@@ -388,8 +388,7 @@ namespace Zafuse{
             int rowIndex = SelDGV.Rows.Add(item.Name, item.Path, item.IniCount, TS_FormatSize(item.TotalSizeBytes));
             SelDGV.ClearSelection();
             SelDGV.Rows[rowIndex].Selected = true;
-                        SaveManuelPath(folderName, folderPath);
-            TSComparer.LoadFolder(folderPath);
+            SaveManuelPath(folderName, folderPath);
             await RenderResults();
             return true;
         }
@@ -402,7 +401,6 @@ namespace Zafuse{
             string selectedPath = SelDGV.SelectedRows[0].Cells["Path"].Value?.ToString();
             if (string.IsNullOrEmpty(selectedPath)) return;
             // if (selectedPath == selectedProccessPath) return;
-            TSComparer.LoadFolder(selectedPath);
             await RenderResults();
         }
         // FORM-LEVEL KEY DOWN
@@ -477,7 +475,6 @@ namespace Zafuse{
             if (rowIndex < 0 || rowIndex >= SelDGV.RowCount) return;
             string selectedPath = SelDGV.Rows[rowIndex].Cells["Path"].Value?.ToString();
             if (string.IsNullOrEmpty(selectedPath)) return;
-            TSComparer.LoadFolder(selectedPath);
             await RenderResults();
         }
         // REMOVE FOLDER
@@ -628,18 +625,10 @@ namespace Zafuse{
                     // Duplicate keys
                     foreach (var kvp in TSComparer.GetDuplicateKeys()){
                         foreach (var keyInfo in kvp.Value){
-                            if (keyInfo.Contains("[SectionMismatch:")){
-                                int openBracket = keyInfo.IndexOf('[');
-                                string pureKey = keyInfo.Substring(0, openBracket).Trim();
-                                string sectionInfo = keyInfo.Substring(openBracket).Replace("[SectionMismatch:", "").Replace("]", "").Trim();
-                                int lineNum = GetFirstFileLine(pureKey);
-                                string details = $"{string.Format(duplicateKeyDetailFormat, kvp.Key)} ({sectionInfo})";
-                                rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.SectionMismatch, pureKey, details, sectionMismatchText));
-                            }else{
-                                int lineNum = GetFirstFileLine(keyInfo);
-                                string details = string.Format(duplicateKeyDetailFormat, kvp.Key);
-                                rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.DuplicateKey, keyInfo, details, duplicateKeyText));
-                            }
+                            string duplicateKey = keyInfo.Contains(".") ? keyInfo.Substring(keyInfo.IndexOf('.') + 1) : keyInfo;
+                            int lineNum = GetFirstFileLine(duplicateKey);
+                            string details = string.Format(duplicateKeyDetailFormat, kvp.Key);
+                            rowsToAdd.Add(() => MainDGVAddRowHelper(lineNum, AnalysisErrorType.DuplicateKey, keyInfo, details, duplicateKeyText));
                         }
                     }
                     // Section mismatches
@@ -656,9 +645,9 @@ namespace Zafuse{
                         var first = counts.First();
                         // Only report mismatches for enabled checks
                         List<string> errorParts = new List<string>();
-                        if (checkPlaceholders > 0 && counts.Any(c => c.Placeholders != first.Placeholders))
+                        if (checkPlaceholders > 0 && counts.Any(c => c.Placeholders != first.Placeholders || c.PlaceholderSignature != first.PlaceholderSignature))
                             errorParts.Add(placeholderErrorText);
-                        if (checkNums && counts.Any(c => c.Numbers != first.Numbers))
+                        if (checkNums && counts.Any(c => c.Numbers != first.Numbers || c.NumberSignature != first.NumberSignature))
                             errorParts.Add(numberErrorText);
                         if (checkPunctuation > 0 && counts.Any(c => c.Punctuation != first.Punctuation))
                             errorParts.Add(punctuationErrorText);
@@ -829,7 +818,7 @@ namespace Zafuse{
                     }
                 }
             }catch (Exception ex){
-                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("ZafuseMain", "zgr_save_failed"), "\n\n", ex.Message));
+                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("ZafuseGenReport", "zgr_save_failed"), "\n\n", ex.Message));
             }
         }
         // THEME SETTINGS
