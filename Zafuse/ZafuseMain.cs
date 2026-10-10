@@ -71,8 +71,9 @@ namespace Zafuse{
             russianToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             spanishToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             turkishToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
-            //
-            SystemEvents.UserPreferenceChanged += (s, e) => TSUseSystemTheme();
+            // DYNAMIC THEME LISTENER
+            // ==================
+            SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         }
         // GLOBAL VARIABLES
         // ======================================================================================================
@@ -102,7 +103,7 @@ namespace Zafuse{
             protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e){
                 Graphics g = e.Graphics;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                float dpiScale = g.DpiX / 96f;
+                float dpiScale = TSDpiHelper.Scale(g.DpiX);
                 Rectangle rect = e.ImageRectangle;
                 using (Pen anti_alias_pen = new Pen(header_colors[2], 2.2f * dpiScale)){
                     anti_alias_pen.StartCap = LineCap.Round;
@@ -116,6 +117,8 @@ namespace Zafuse{
             }
         }
         private class HeaderColors : ProfessionalColorTable{
+            public override Color MenuStripGradientBegin => header_colors[0];
+            public override Color MenuStripGradientEnd => header_colors[0];
             public override Color MenuItemSelected => header_colors[0];
             public override Color ToolStripDropDownBackground => header_colors[0];
             public override Color ImageMarginGradientBegin => header_colors[0];
@@ -138,6 +141,7 @@ namespace Zafuse{
         // LOAD SOFTWARE SETTINGS
         // ======================================================================================================
         private void RunSoftwareEngine(){
+            try { TSDpiHelper.ScaleToolStripRecursive(HeaderMenu, this.DeviceDpi); } catch { }
             HeaderMenu.Cursor = Cursors.Hand;
             //
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, SelDGV, new object[] { true });
@@ -193,6 +197,35 @@ namespace Zafuse{
         // TOOLTIP SETTINGS
         // ======================================================================================================
         private void MainToolTip_Draw(object sender, DrawToolTipEventArgs e){ e.DrawBackground(); e.DrawBorder(); e.DrawText(); }
+        // DPI SCALING
+        // ======================================================================================================
+        private void ApplyDpiScaling(){
+            if (IsDisposed || Disposing) return;
+            try{
+                TSDpiHelper.ScaleDataGridView(SelDGV, new[]{ 85, -1, 75, 120 }, 32, 5);
+                TSDpiHelper.ScaleDataGridView(MainDGV, new[]{ 65, 150, 200, -1 }, 32, 5);
+                TSDpiHelper.ScaleToolStripRecursive(HeaderMenu, this.DeviceDpi);
+                int pad = TSDpiHelper.ScalePx(5, this.DeviceDpi);
+                foreach (var tableMod in new[] { SelDGV, MainDGV }){
+                    if (tableMod == null || tableMod.IsDisposed) continue;
+                    foreach (DataGridViewColumn columnPadding in tableMod.Columns){
+                        columnPadding.DefaultCellStyle.Padding = new Padding(pad);
+                    }
+                }
+            }catch{ }
+        }
+        protected override void OnDpiChanged(DpiChangedEventArgs e){
+            base.OnDpiChanged(e);
+            try{
+                this.SuspendLayout();
+                ApplyDpiScaling();
+                if (e.DeviceDpiNew != e.DeviceDpiOld)
+                    Theme_engine(theme);
+                this.ResumeLayout(true);
+                this.PerformLayout();
+                this.Invalidate(true);
+            }catch{ }
+        }
         // LOAD
         // ====================================================================================================== 
         private async void ZafuseMain_Load(object sender, EventArgs e){ 
@@ -206,27 +239,20 @@ namespace Zafuse{
             // LOAD DATA
             // ====================================
             await RenderResults();
-            // SOFTWARE UPDATE CHECK
+            // SOFTWARE UPDATE CHECK NATIVE
             // ====================================
-            await Task.Run(() => Software_update_check(0));
+            try { _ = Software_update_check(0); } catch (Exception) { }
         }
         // SETUP SEL DGV
         // ====================================================================================================== 
         private void SetupDGV(){
             TSGetLangs software_lang = new TSGetLangs(lang_path);
             //
-            int ScaleDPI(int size){
-                return (int)(size * this.DeviceDpi / 96f);
-            }
-            //
             SelDGV.Columns.Clear();
             SelDGV.Columns.Add("Name", software_lang.TSReadLangs("ZafuseMain", "zm_s_name"));
             SelDGV.Columns.Add("Path", software_lang.TSReadLangs("ZafuseMain", "zm_s_path"));
             SelDGV.Columns.Add("IniCount", software_lang.TSReadLangs("ZafuseMain", "zm_s_count"));
             SelDGV.Columns.Add("TotalSize", software_lang.TSReadLangs("ZafuseMain", "zm_s_size"));
-            SelDGV.Columns[0].Width = ScaleDPI(85);
-            SelDGV.Columns[2].Width = ScaleDPI(75);
-            SelDGV.Columns[3].Width = ScaleDPI(120);
             foreach (DataGridViewColumn SelDGV_Column in SelDGV.Columns) SelDGV_Column.SortMode = DataGridViewColumnSortMode.NotSortable;
             PreloadLangFilePaths();
             //
@@ -235,17 +261,10 @@ namespace Zafuse{
             MainDGV.Columns.Add("Type", software_lang.TSReadLangs("ZafuseMain", "zm_h_error_type"));
             MainDGV.Columns.Add("Key", software_lang.TSReadLangs("ZafuseMain", "zm_h_key_section"));
             MainDGV.Columns.Add("Details", software_lang.TSReadLangs("ZafuseMain", "zm_h_detailed_analysis"));
-            MainDGV.Columns[0].Width = ScaleDPI(65);
-            MainDGV.Columns[1].Width = ScaleDPI(150);
-            MainDGV.Columns[2].Width = ScaleDPI(200);
             MainDGV.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             foreach (DataGridViewColumn MainDGV_Column in MainDGV.Columns) MainDGV_Column.SortMode = DataGridViewColumnSortMode.NotSortable;
             //
-            foreach (var tableMod in new[] { SelDGV, MainDGV }){
-                foreach (DataGridViewColumn columnPadding in tableMod.Columns){
-                    columnPadding.DefaultCellStyle.Padding = new Padding(ScaleDPI(5));
-                }
-            }
+            ApplyDpiScaling();
         }
         // HELPERS
         // ======================================================================================================
@@ -850,7 +869,18 @@ namespace Zafuse{
         private void DarkThemeToolStripMenuItem_Click(object sender, EventArgs e){
             themeSystem = 0; Theme_engine(0); SaveTheme(0); Select_theme_active(sender);
         }
-        private void TSUseSystemTheme(){ if (themeSystem == 2) Theme_engine(TSThemeModeHelper.GetSystemTheme(2)); }
+        private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e){
+            TSUseSystemTheme();
+        }
+        private void TSUseSystemTheme(){
+            if (themeSystem != 2) return;
+            if (IsDisposed || Disposing) return;
+            if (InvokeRequired){
+                try { BeginInvoke(new Action(() => TSUseSystemTheme())); } catch { }
+                return;
+            }
+            Theme_engine(TSThemeModeHelper.GetSystemTheme(2));
+        }
         private void SaveTheme(int ts){
             // SAVE CURRENT THEME
             try{
@@ -862,6 +892,7 @@ namespace Zafuse{
         // ======================================================================================================
         private void Theme_engine(int ts){
             try{
+                try { TSDpiHelper.ScaleToolStripRecursive(HeaderMenu, this.DeviceDpi); } catch { }
                 theme = ts;
                 //
                 TSThemeModeHelper.SetThemeMode(ts == 0);
@@ -869,32 +900,32 @@ namespace Zafuse{
                 //
                 if (theme == 1){
                     // TOP MENU LOGO CHANGE
-                    TSImageRenderer(settingsToolStripMenuItem, Properties.Resources.tm_settings_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(themeToolStripMenuItem, Properties.Resources.tm_theme_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(languageToolStripMenuItem, Properties.Resources.tm_language_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(startupToolStripMenuItem, Properties.Resources.tm_startup_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(contentAnalysis, Properties.Resources.tm_analysis_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(checkForUpdatesToolStripMenuItem, Properties.Resources.tm_update_light, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(settingsToolStripMenuItem, Properties.Resources.tm_settings_light, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(themeToolStripMenuItem, Properties.Resources.tm_theme_light, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(languageToolStripMenuItem, Properties.Resources.tm_language_light, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(startupToolStripMenuItem, Properties.Resources.tm_startup_light, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(contentAnalysis, Properties.Resources.tm_analysis_light, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(checkForUpdatesToolStripMenuItem, Properties.Resources.tm_update_light, 0, ContentAlignment.MiddleCenter);
                     // DONATE
-                    TSImageRenderer(donateToolStripMenuItem, Properties.Resources.tm_donate_light, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(donateToolStripMenuItem, Properties.Resources.tm_donate_light, 0, ContentAlignment.MiddleCenter);
                     // ABOUT
-                    TSImageRenderer(aboutToolStripMenuItem, Properties.Resources.tm_about_light, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(aboutToolStripMenuItem, Properties.Resources.tm_about_light, 0, ContentAlignment.MiddleCenter);
                     // UI
                     TSImageRenderer(BtnAddFolder, Properties.Resources.ct_add_light, 17, ContentAlignment.MiddleRight);
                     TSImageRenderer(BtnRemoveFolder, Properties.Resources.ct_remove_light, 17, ContentAlignment.MiddleRight);
                     TSImageRenderer(BtnGenReport, Properties.Resources.ct_generate_light, 17, ContentAlignment.MiddleRight);
                 }else if (theme == 0){
                     // TOP MENU LOGO CHANGE
-                    TSImageRenderer(settingsToolStripMenuItem, Properties.Resources.tm_settings_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(themeToolStripMenuItem, Properties.Resources.tm_theme_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(languageToolStripMenuItem, Properties.Resources.tm_language_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(startupToolStripMenuItem, Properties.Resources.tm_startup_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(contentAnalysis, Properties.Resources.tm_analysis_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(checkForUpdatesToolStripMenuItem, Properties.Resources.tm_update_dark, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(settingsToolStripMenuItem, Properties.Resources.tm_settings_dark, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(themeToolStripMenuItem, Properties.Resources.tm_theme_dark, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(languageToolStripMenuItem, Properties.Resources.tm_language_dark, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(startupToolStripMenuItem, Properties.Resources.tm_startup_dark, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(contentAnalysis, Properties.Resources.tm_analysis_dark, 0, ContentAlignment.MiddleCenter);
+                    TSImageRenderer(checkForUpdatesToolStripMenuItem, Properties.Resources.tm_update_dark, 0, ContentAlignment.MiddleCenter);
                     // DONATE
-                    TSImageRenderer(donateToolStripMenuItem, Properties.Resources.tm_donate_dark, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(donateToolStripMenuItem, Properties.Resources.tm_donate_dark, 0, ContentAlignment.MiddleCenter);
                     // ABOUT
-                    TSImageRenderer(aboutToolStripMenuItem, Properties.Resources.tm_about_dark, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(aboutToolStripMenuItem, Properties.Resources.tm_about_dark, 0, ContentAlignment.MiddleCenter);
                     // UI
                     TSImageRenderer(BtnAddFolder, Properties.Resources.ct_add_dark, 17, ContentAlignment.MiddleRight);
                     TSImageRenderer(BtnRemoveFolder, Properties.Resources.ct_remove_dark, 17, ContentAlignment.MiddleRight);
@@ -1167,9 +1198,11 @@ namespace Zafuse{
         // UPDATE CHECK ENGINE
         // ======================================================================================================
         private void CheckForUpdatesToolStripMenuItem_Click(object sender, EventArgs e){
-            Task.Run(() => Software_update_check(1));
+            try{
+                _ = Software_update_check(1);
+            }catch (Exception){ }
         }
-        public async void Software_update_check(int _check_update_ui){
+        public async Task Software_update_check(int _check_update_ui){
             try{
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 SetUpdateMenuEnabled(false);
@@ -1183,7 +1216,7 @@ namespace Zafuse{
                     handler.UseProxy = false;
                     using (HttpClient httpClient = new HttpClient(handler)){
                         httpClient.Timeout = TimeSpan.FromSeconds(15);
-                        httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
+                        httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true, MustRevalidate = true };
                         httpClient.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
                         string versionUrl = TS_LinkSystem.github_link_lv;
                         versionUrl += (versionUrl.Contains("?") ? "&" : "?") + "_ts=" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -1226,18 +1259,23 @@ namespace Zafuse{
                 }
             }catch (Exception ex){
                 Debug.WriteLine(ex, "Software_update_check()");
-                TSGetLangs software_lang = new TSGetLangs(lang_path);
-                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_error"), "\n\n", ex.Message), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                if (_check_update_ui == 1 && !IsDisposed && !Disposing){
+                    TSGetLangs software_lang = new TSGetLangs(lang_path);
+                    TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_error"), "\n\n", ex.Message), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                }
             }finally{
                 SetUpdateMenuEnabled(true);
             }
         }
         private void SetUpdateMenuEnabled(bool enabled){
-            if (InvokeRequired){
-                BeginInvoke(new Action(() => checkForUpdatesToolStripMenuItem.Enabled = enabled));
-            }else{
-                checkForUpdatesToolStripMenuItem.Enabled = enabled;
-            }
+            try{
+                if (IsDisposed || Disposing) return;
+                if (InvokeRequired){
+                    BeginInvoke(new Action(() => checkForUpdatesToolStripMenuItem.Enabled = enabled));
+                }else{
+                    checkForUpdatesToolStripMenuItem.Enabled = enabled;
+                }
+            }catch { }
         }
         // DONATE LINK
         // ======================================================================================================
@@ -1271,7 +1309,9 @@ namespace Zafuse{
         }
         // EXIT
         // ======================================================================================================
-        private void Software_exit() { Application.Exit(); }
-        private void ZafuseMain_FormClosing(object sender, FormClosingEventArgs e){ Software_exit(); }
+        private void ZafuseMain_FormClosing(object sender, FormClosingEventArgs e){
+            try { SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged; } catch { }
+            Application.Exit();
+        }
     }
 }
